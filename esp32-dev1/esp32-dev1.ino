@@ -21,14 +21,13 @@ Adafruit_ADS1115 ads;
 
 // ================= MCP4725 DAC =================
 Adafruit_MCP4725 dac;
-const uint8_t DAC_ADDR = 0x60;
-
+const uint8_t MCP_ADDR = 0x60;
+const uint8_t ADS_ADDR = 0x48;
+const uint8_t SSD_ADDR = 0x3C;
 // ================= PINS =================
 const uint8_t INC_PIN = 25;
 const uint8_t UD_PIN  = 27;
 const uint8_t CS_PIN  = 33;
-
-const uint8_t ADS_ADDR = 0x48;
 
 // ================= VOLTAGE =================
 const float VL = 0.0;
@@ -62,8 +61,10 @@ void setup()
   // ---------------- X9C10X ----------------
   Serial.println(pot.getType());
 
+
   pot.begin(INC_PIN, UD_PIN, CS_PIN);
   pot.setPosition(0);
+  Serial.println("Pot initialized at 0");
 
   // ---------------- I2C ----------------
   Wire.begin();
@@ -80,10 +81,29 @@ void setup()
   display.setTextSize(1);
 
   display.setCursor(0, 0);
-  display.println("X9C10X + ADS1115 + MCP4725");
+  display.println("X9C10X + ADS1115 + MCP4725+ analog Pot");
   display.println();
   display.println("Initializing...");
   display.display();
+  // ---oled display---
+    if (!ads.begin(SSD_ADDR))
+  {
+    Serial.println("SSD1306 not found - check wiring/address");
+
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.println("SSD1306 ERROR!");
+    display.println();
+    display.println("Check wiring");
+    display.display();
+
+    while (1)
+    {
+      delay(10);
+    }
+  }
+
+
 
   // ---------------- ADS1115 ----------------
   if (!ads.begin(ADS_ADDR))
@@ -106,7 +126,7 @@ void setup()
   ads.setGain(GAIN_TWOTHIRDS);
 
   // ---------------- MCP4725 DAC ----------------
-  if (!dac.begin(DAC_ADDR))
+  if (!dac.begin(MCP_ADDR))
   {
     Serial.println("MCP4725 not found - check wiring/address");
 
@@ -127,7 +147,7 @@ void setup()
 
   Serial.println();
   Serial.println("Ramping pot (100 pos) + DAC (4096 codes, full resolution)...");
-  Serial.println("Position\tDAC_Bits\tV_set_dac\tV_set_pot\tADC_A0_raw\tV_adc_pot\tADC_A1_raw\tV_adc_a1");
+  Serial.println("Position\tDAC_Bits\tV_set_dac\tV_set_pot\tADC_A0_raw\tV_adc_pot\tADC_A1_raw\tV_adc_dac");
   Serial.println();
 
   display.clearDisplay();
@@ -144,10 +164,11 @@ void setup()
 void loop()
 {
   // ---------------- Ramp UP: pot 0 -> 99, dac 0 -> 4095 ----------------
+
   for (uint8_t position = 0; position <= MAX_POS; position++)
   {
     pot.setPosition(position);
-    delay(RAMP_DELAY); // let wiper settle once per new pot position
+    delay(RAMP_DELAY);
 
     uint32_t dacStart = (uint32_t)position * DAC_STEPS_PER_POS;
 
@@ -155,7 +176,6 @@ void loop()
     {
       uint32_t dacBits = dacStart + sub;
       if (dacBits > MAX_DAC_BITS) dacBits = MAX_DAC_BITS;
-
       rampStep(position, (uint16_t)dacBits);
     }
   }
@@ -168,14 +188,11 @@ void loop()
     pot.setPosition(position);
     delay(RAMP_DELAY);
 
-    int32_t dacStart = (int32_t)position * DAC_STEPS_PER_POS + (DAC_STEPS_PER_POS - 1);
-
     for (int sub = DAC_STEPS_PER_POS - 1; sub >= 0; sub--)
     {
       int32_t dacBits = (int32_t)position * DAC_STEPS_PER_POS + sub;
       if (dacBits > MAX_DAC_BITS) dacBits = MAX_DAC_BITS;
       if (dacBits < 0) dacBits = 0;
-
       rampStep(position, (uint16_t)dacBits);
     }
   }
@@ -198,44 +215,53 @@ void rampStep(uint8_t position, uint16_t dacBits)
   // Voltage the pot is set to output
   float V_set_pot = VL + (VH - VL) * ((float)position / MAX_POS);
 
-  // Read ADS1115 A0 (digi pot) and A1 (dac)
-  int16_t adc_bits_a0 = ads.readADC_SingleEnded(0); // pot
-  int16_t adc_bits_a1 = ads.readADC_SingleEnded(1); // dac
+  // Read ADS1115 A2 (digi pot) ,A3 (dac) and A1 (analog pot)
+  int16_t adc_bits_a2_pot = ads.readADC_SingleEnded(2); // pot
+  int16_t adc_bits_a3_dac = ads.readADC_SingleEnded(3); // dac
+  int16_t adc_bits_a1_Apot = ads.readADC_SingleEnded(1); // analog pot
 
   // Convert ADC readings to measured voltages (SAME LSB, same ADC/gain)
-  float V_adc_pot = adc_bits_a0 * ADS_LSB_VOLTS;
-  float V_adc_a1 = adc_bits_a1 * ADS_LSB_VOLTS;
+  float V_adc_pot = adc_bits_a2_pot * ADS_LSB_VOLTS;
+  float V_adc_dac = adc_bits_a3_dac * ADS_LSB_VOLTS;
+  float V_adc_Apot = adc_bits_a1_Apot * ADS_LSB_VOLTS;
 
   // ==================================================
   // SERIAL OUTPUT
   // ==================================================
 
-  Serial.print("Position: ");
+  Serial.print("Pos: ");
   Serial.print(position);
+  
+  Serial.print("\tV_set_pot: ");
+  Serial.print(V_set_pot, 5);
+  Serial.print(" V");
 
-  Serial.print("\tDAC_Bits: ");
+
+  Serial.print("\tdac_bits: ");
   Serial.print(dacBits);
 
   Serial.print("\tV_set_dac: ");
   Serial.print(V_set_dac, 4);
   Serial.print(" V");
 
-  Serial.print("\tV_set_pot: ");
-  Serial.print(V_set_pot, 3);
+
+/*Serial.print("\tV_adc_pot: ");
+  Serial.print(V_adc_Apot, 3);
   Serial.print(" V");
+*/
 
-  Serial.print("\tADC_A0_raw: ");
-  Serial.print(adc_bits_a0);
-
+  Serial.print("\tadc_bits_pot: ");
+  Serial.print(adc_bits_a2_pot);
+  
   Serial.print("\tV_adc_pot: ");
-  Serial.print(V_adc_pot, 3);
+  Serial.print(V_adc_pot, 5);
   Serial.print(" V");
 
-  Serial.print("\tADC_A1_raw: ");
-  Serial.print(adc_bits_a1);
+  Serial.print("\tadc_bits_dac: ");
+  Serial.print(adc_bits_a3_dac);
 
-  Serial.print("\tV_adc_a1: ");
-  Serial.print(V_adc_a1, 4);
+  Serial.print("\tV_adc_dac: ");
+  Serial.print(V_adc_dac, 5);
   Serial.println(" V");
 
   // ==================================================
@@ -248,28 +274,36 @@ void rampStep(uint8_t position, uint16_t dacBits)
   display.setCursor(0, 0);
   display.print("Pos:");
   display.print(position);
-  display.print(" DACb:");
-  display.println(dacBits);
-
-  display.setCursor(0, 12);
+ 
+  display.setCursor(0, 30);
   display.print("Vset_dac:");
   display.print(V_set_dac, 3);
   display.println("V");
-
-  display.setCursor(0, 24);
+ 
+  display.setCursor(0, 10);
   display.print("Vset_pot:");
   display.print(V_set_pot, 2);
   display.println("V");
 
-  display.setCursor(0, 36);
-  display.print("Vadc_pot:");
+  display.setCursor(0,20);
+  display.print("dac_bits:");
+  display.println(dacBits);
 
+ 
+ /* display.setCursor(0, 36);
+  display.print("Vadc_Apot:");
+  display.print(V_adc_Apot, 3);
+  display.println("V");
+  */
+
+  display.setCursor(0, 40);
+  display.print("Vadc_pot:");
   display.print(V_adc_pot, 3);
   display.println("V");
 
-  display.setCursor(0, 48);
-  display.print("Vadc_a1:");
-  display.print(V_adc_a1, 3);
+  display.setCursor(0, 50);
+  display.print("Vadc_dac:");
+  display.print(V_adc_dac, 3);
   display.println("V");
 
   display.display();
