@@ -18,6 +18,7 @@ Adafruit_ADS1115 ads2;   // second ADS1115
 const uint8_t ADS1_ADDR = 0x48;
 const uint8_t ADS2_ADDR = 0x49;
 const uint8_t ADC_CHANNEL = 0;      // A0 on each ADS1115
+const uint8_t ADC_CHANNEL_1 = 1;      // A0 on each ADS1115
 const float ADS_LSB_VOLTS = 0.0001875; // GAIN_TWOTHIRDS -> ±6.144V range
 
 // ================= MCP4725 DAC =================
@@ -29,7 +30,7 @@ const float DAC_VREF = 5.0;         // adjust if your DAC's Vcc/reference isn't 
 uint16_t dacSetValue;
 float V_set_dac;
 
-const uint16_t NUM_SAMPLES = 1000;
+const uint16_t NUM_SAMPLES = 100;
 const uint16_t SAMPLE_DELAY_MS = 0; // set >0 if you want a delay between each of the 1000 samples
 
 // ======================================================
@@ -64,7 +65,7 @@ void setup() {
     display.display();
     while (1) delay(10);
   }
-  ads1.setGain(GAIN_TWOTHIRDS);
+  ads1.setGain(GAIN_TWOTHIRDS); //3mV fluctuation
 
   // ---------------- ADS1115 #2 (0x49) ----------------
   if (!ads2.begin(ADS2_ADDR)) {
@@ -75,7 +76,7 @@ void setup() {
     display.display();
     while (1) delay(10);
   }
-  ads2.setGain(GAIN_TWOTHIRDS);
+  ads2.setGain(GAIN_TWOTHIRDS); //3mV least count
 
   // ---------------- MCP4725 DAC ----------------
   if (!dac.begin(MCP_ADDR)) {
@@ -119,24 +120,25 @@ void loop() {
 
   for (uint16_t i = 0; i < NUM_SAMPLES; i++) {
     sum1 += ads1.readADC_SingleEnded(ADC_CHANNEL);
-    sum2 += ads2.readADC_SingleEnded(ADC_CHANNEL);
+    sum2 += ads1.readADC_SingleEnded(ADC_CHANNEL_1);
     if (SAMPLE_DELAY_MS > 0) delay(SAMPLE_DELAY_MS);
   }
 
   float avgRaw1 = (float)sum1 / NUM_SAMPLES;
   float avgRaw2 = (float)sum2 / NUM_SAMPLES;
 
-  float V_adc1 = avgRaw1 * ADS_LSB_VOLTS;
-  float V_adc2 = avgRaw2 * ADS_LSB_VOLTS;
+  float V_adc_a0_dac = avgRaw1 * ADS_LSB_VOLTS;
+  float V_adc_a1_gnd = avgRaw2 * ADS_LSB_VOLTS;
 
-  float diff1 = V_adc1 - V_set_dac;
-  float diff2 = V_adc2 - V_set_dac;
+  float diff1 = V_adc_a0_dac - V_set_dac;
+  float diff2 = V_adc_a0_dac - V_adc_a1_gnd;
 
   // ---------------- Serial ----------------
-  Serial.print("ADS1(0x48) A0 avg raw: ");
+  Serial.print("ADS2(0x49) A0 avg raw: ");
   Serial.print(avgRaw1, 2);
   Serial.print("\tV: ");
-  Serial.print(V_adc1, 5);
+  Serial.print("DAC_out: ");
+  Serial.print(V_adc_a0_dac, 5);
   Serial.print(" V\tDiff_vs_DAC: ");
   Serial.print(diff1, 5);
   Serial.println(" V");
@@ -144,7 +146,8 @@ void loop() {
   Serial.print("ADS2(0x49) A0 avg raw: ");
   Serial.print(avgRaw2, 2);
   Serial.print("\tV: ");
-  Serial.print(V_adc2, 5);
+  Serial.print("GND: ");
+  Serial.print(V_adc_a1_gnd, 5);
   Serial.print(" V\tDiff_vs_DAC: ");
   Serial.print(diff2, 5);
   Serial.println(" V");
@@ -164,13 +167,13 @@ void loop() {
   display.println("V");
 
   display.setCursor(0, 12);
-  display.print("A0_48:");
-  display.print(V_adc1, 3);
+  display.print("A0_48_a0:");
+  display.print(V_adc_a0_dac, 3);
   display.println("V");
 
   display.setCursor(0, 24);
-  display.print("A0_49:");
-  display.print(V_adc2, 3);
+  display.print("A0_49_a1:");
+  display.print(V_adc_a1_gnd, 3);
   display.println("V");
 
   display.setCursor(0, 36);
@@ -185,5 +188,5 @@ void loop() {
 
   display.display();
 
-  delay(500);
+  delay(30000);
 }
