@@ -5,186 +5,169 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_MCP4725.h>
 
-// ================= OLED =================
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_ADDR 0x3C
+
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// ================= ADS1115 (x2) =================
-Adafruit_ADS1115 ads1;   // first ADS1115
-Adafruit_ADS1115 ads2;   // second ADS1115
+Adafruit_ADS1115 ads1;
 
-const uint8_t ADS1_ADDR = 0x48;
-const uint8_t ADS2_ADDR = 0x49;
-const uint8_t ADC_CHANNEL = 0;      // A0 on each ADS1115
-const uint8_t ADC_CHANNEL_1 = 1;      // A0 on each ADS1115
-const float ADS_LSB_VOLTS = 0.0001875; // GAIN_TWOTHIRDS -> ±6.144V range
+const uint8_t ADC_CHANNEL_0 = 0;
+const uint8_t ADC_CHANNEL_1 = 1;
+const uint8_t ADC_CHANNEL_2 = 2;
 
-// ================= MCP4725 DAC =================
+const float ADS_LSB_VOLTS = 0.0001875;
+
 Adafruit_MCP4725 dac;
+
 const uint8_t MCP_ADDR = 0x60;
 const uint16_t MAX_DAC_BITS = 4095;
-const float DAC_VREF = 5.0;         // adjust if your DAC's Vcc/reference isn't 5V
 
 uint16_t dacSetValue;
+
 float V_set_dac;
 
 const uint16_t NUM_SAMPLES = 100;
-const uint16_t SAMPLE_DELAY_MS = 0; // set >0 if you want a delay between each of the 1000 samples
-
-// ======================================================
+const uint16_t SAMPLE_DELAY_MS = 0;
 
 void setup() {
+
   Serial.begin(115200);
   delay(1000);
 
-  // ---------------- I2C0 ----------------
   Wire.setSDA(20);
   Wire.setSCL(21);
   Wire.begin();
 
-  // ---------------- OLED ----------------
   if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
     Serial.println("OLED not found!");
-    while (1) delay(10);
+    while (1) {
+      delay(10);
+    }
   }
+
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
   display.setCursor(0, 0);
+
   display.println("Init...");
   display.display();
 
-  // ---------------- ADS1115 #1 (0x48) ----------------
-  if (!ads1.begin(ADS1_ADDR)) {
-    Serial.println("ADS1115 #1 (0x48) not found - check wiring/address");
+  if (!ads1.begin(0x48)) {
+    Serial.println("ADS1115 not found!");
     display.clearDisplay();
     display.setCursor(0, 0);
-    display.println("ADS1 (0x48) ERROR!");
+    display.println("ADS1115 ERROR");
     display.display();
-    while (1) delay(10);
-  }
-  ads1.setGain(GAIN_TWOTHIRDS); //3mV fluctuation
 
-  // ---------------- ADS1115 #2 (0x49) ----------------
-  if (!ads2.begin(ADS2_ADDR)) {
-    Serial.println("ADS1115 #2 (0x49) not found - check wiring/address");
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.println("ADS2 (0x49) ERROR!");
-    display.display();
-    while (1) delay(10);
+    while (1) {
+      delay(10);
+    }
   }
-  ads2.setGain(GAIN_TWOTHIRDS); //3mV least count
 
-  // ---------------- MCP4725 DAC ----------------
+  ads1.setGain(GAIN_TWOTHIRDS);
+
   if (!dac.begin(MCP_ADDR)) {
-    Serial.println("MCP4725 not found - check wiring/address");
+    Serial.println("MCP4725 not found!");
     display.clearDisplay();
     display.setCursor(0, 0);
-    display.println("MCP4725 ERROR!");
+    display.println("MCP4725 ERROR");
     display.display();
-    while (1) delay(10);
+
+    while (1) {
+      delay(10);
+    }
   }
 
-  // ---------------- Pick a random DAC value ONCE, hold it constant ----------------
-  //randomSeed(micros());
-  //dacSetValue = random(0, MAX_DAC_BITS + 1);
   dacSetValue = 2000;
-  dac.setVoltage(dacSetValue, false);
-  V_set_dac = DAC_VREF * ((float)dacSetValue / MAX_DAC_BITS);
 
-  Serial.println("=== DAC value fixed for this run ===");
-  Serial.print("DAC code: ");
-  Serial.print(dacSetValue);
-  Serial.print("   V_set_dac: ");
-  Serial.print(V_set_dac, 5);
-  Serial.println(" V");
+  dac.setVoltage(dacSetValue, false);
+
   Serial.println();
+  Serial.print("DAC bits: ");
+  Serial.println(dacSetValue);
 
   display.clearDisplay();
-  display.setCursor(0, 0);
-  display.println("DAC fixed at:");
-  display.print(V_set_dac, 5);
-  display.println(" V");
+
   display.display();
+
   delay(1500);
 }
 
-// ======================================================
-
 void loop() {
+
+  long sum0 = 0;
   long sum1 = 0;
   long sum2 = 0;
 
   for (uint16_t i = 0; i < NUM_SAMPLES; i++) {
-    sum1 += ads1.readADC_SingleEnded(ADC_CHANNEL);
-    sum2 += ads1.readADC_SingleEnded(ADC_CHANNEL_1);
-    if (SAMPLE_DELAY_MS > 0) delay(SAMPLE_DELAY_MS);
+
+    sum0 += ads1.readADC_SingleEnded(ADC_CHANNEL_0);
+    sum1 += ads1.readADC_SingleEnded(ADC_CHANNEL_1);
+    sum2 += ads1.readADC_SingleEnded(ADC_CHANNEL_2);
+
+    if (SAMPLE_DELAY_MS > 0) {
+      delay(SAMPLE_DELAY_MS);
+    }
   }
 
+  float avgRaw0 = (float)sum0 / NUM_SAMPLES;
   float avgRaw1 = (float)sum1 / NUM_SAMPLES;
   float avgRaw2 = (float)sum2 / NUM_SAMPLES;
 
-  float V_adc_a0_dac = avgRaw1 * ADS_LSB_VOLTS;
-  float V_adc_a1_gnd = avgRaw2 * ADS_LSB_VOLTS;
+  float V_ads1_a0 = avgRaw0 * ADS_LSB_VOLTS;
+  float V_ads1_a1 = avgRaw1 * ADS_LSB_VOLTS;
+  float V_ads1_a2 = avgRaw2 * ADS_LSB_VOLTS;
 
-  float diff1 = V_adc_a0_dac - V_set_dac;
-  float diff2 = V_adc_a0_dac - V_adc_a1_gnd;
+  float diff3_V_ref = V_ads1_a2 - V_ads1_a1;
 
-  // ---------------- Serial ----------------
-  Serial.print("ADS2(0x49) A0 avg raw: ");
-  Serial.print(avgRaw1, 2);
-  Serial.print("\tV: ");
-  Serial.print("DAC_out: ");
-  Serial.print(V_adc_a0_dac, 5);
-  Serial.print(" V\tDiff_vs_DAC: ");
-  Serial.print(diff1, 5);
+  float diff2 = V_ads1_a0 - V_ads1_a1;
+
+  V_set_dac =
+      diff3_V_ref *
+      ((float)dacSetValue / MAX_DAC_BITS);
+
+  float diff1 = V_set_dac - diff2;
+
+  Serial.print("Vset expected  : ");
+  Serial.print(V_set_dac, 5);
   Serial.println(" V");
 
-  Serial.print("ADS2(0x49) A0 avg raw: ");
-  Serial.print(avgRaw2, 2);
-  Serial.print("\tV: ");
-  Serial.print("GND: ");
-  Serial.print(V_adc_a1_gnd, 5);
-  Serial.print(" V\tDiff_vs_DAC: ");
+  Serial.print("Vdac measured  : ");
   Serial.print(diff2, 5);
   Serial.println(" V");
 
-  Serial.print("V_set_dac: ");
-  Serial.print(V_set_dac, 4);
+  Serial.print("Vset - Vdac    : ");
+  Serial.print(diff1, 5);
   Serial.println(" V");
+
   Serial.println();
 
-  // ---------------- OLED ----------------
   display.clearDisplay();
+
   display.setTextSize(1);
 
   display.setCursor(0, 0);
-  display.print("DAC:");
+  display.print("Vset: ");
   display.print(V_set_dac, 3);
-  display.println("V");
+  display.println(" V");
 
-  display.setCursor(0, 12);
-  display.print("A0_48_a0:");
-  display.print(V_adc_a0_dac, 3);
-  display.println("V");
+  display.setCursor(0, 16);
+  display.print("Vadc: ");
+  display.print(diff2, 3);
+  display.println(" V");
 
-  display.setCursor(0, 24);
-  display.print("A0_49_a1:");
-  display.print(V_adc_a1_gnd, 3);
-  display.println("V");
-
-  display.setCursor(0, 36);
-  display.print("D1:");
+  display.setCursor(0, 32);
+  display.print("Error: ");
   display.print(diff1, 3);
-  display.println("V");
+  display.println(" V");
 
   display.setCursor(0, 48);
-  display.print("D2:");
-  display.print(diff2, 3);
-  display.println("V");
+  display.print("Vref: ");
+  display.print(diff3_V_ref, 3);
+  display.println(" V");
 
   display.display();
 
