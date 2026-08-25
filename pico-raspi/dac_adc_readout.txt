@@ -1,0 +1,1339 @@
+Panther,~/D/k/c/c/m/pico-raspi>arduino-cli monitor -p /dev/cu.usbmodem11201 -c baudrate=9600            17:39:59
+Monitor port settings:
+  baudrate=9600
+  bits=8
+  dtr=on
+  parity=none
+  rts=on
+  stop_bits=1
+
+Connecting to /dev/cu.usbmodem11201. Press CTRL-C to exit.
+Vset expected  : 0.11392 V
+Vdac measured  : 0.11175 V
+Vset - Vdac    : 0.00217 V
+Dac bits       : 90
+
+Vset expected  : 0.17084 V
+Vdac measured  : 0.16743 V
+Vset - Vdac    : 0.00341 V
+Dac bits       : 135
+
+Vset expected  : 0.22788 V
+Vdac measured  : 0.22524 V
+Vset - Vdac    : 0.00264 V
+Dac bits       : 180
+
+Vset expected  : 0.28486 V
+Vdac measured  : 0.28005 V
+Vset - Vdac    : 0.00481 V
+Dac bits       : 225
+
+Vset expected  : 0.34180 V
+Vdac measured  : 0.33669 V
+Vset - Vdac    : 0.00511 V
+Dac bits       : 270
+
+Vset expected  : 0.39877 V
+Vdac measured  : 0.39234 V
+Vset - Vdac    : 0.00643 V
+Dac bits       : 315
+
+Vset expected  : 0.45563 V
+Vdac measured  : 0.44829 V
+Vset - Vdac    : 0.00734 V
+Dac bits       : 360
+
+Vset expected  : 0.51268 V
+Vdac measured  : 0.50241 V
+Vset - Vdac    : 0.01027 V
+Dac bits       : 405
+
+Vset expected  : 0.56841 V
+Vdac measured  : 0.55575 V
+Vset - Vdac    : 0.01266 V
+Dac bits       : 450
+
+Vset expected  : 0.62560 V
+Vdac measured  : 0.61461 V
+Vset - Vdac    : 0.01099 V
+Dac bits       : 495
+
+Vset expected  : 0.68269 V
+Vdac measured  : 0.67050 V
+Vset - Vdac    : 0.01219 V
+Dac bits       : 540
+
+Vset expected  : 0.73946 V
+Vdac measured  : 0.72702 V
+Vset - Vdac    : 0.01244 V
+Dac bits       : 585
+
+Vset expected  : 0.79653 V
+Vdac measured  : 0.78276 V
+Vset - Vdac    : 0.01377 V
+Dac bits       : 630
+
+Vset expected  : 0.85373 V
+Vdac measured  : 0.83874 V
+Vset - Vdac    : 0.01499 V
+Dac bits       : 675
+
+Vset expected  : 0.91039 V
+Vdac measured  : 0.89349 V
+Vset - Vdac    : 0.01690 V
+Dac bits       : 720
+
+Vset expected  : 0.96631 V
+Vdac measured  : 0.94896 V
+Vset - Vdac    : 0.01735 V
+Dac bits       : 765
+
+Vset expected  : 1.02337 V
+Vdac measured  : 1.00368 V
+Vset - Vdac    : 0.01969 V
+Dac bits       : 810
+
+Vset expected  : 1.08138 V
+Vdac measured  : 1.06221 V
+Vset - Vdac    : 0.01917 V
+Dac bits       : 855
+
+Vset expected  : 1.13718 V
+Vdac measured  : 1.11666 V
+Vset - Vdac    : 0.02052 V
+Dac bits       : 900
+
+Vset expected  : 1.19532 V
+Vdac measured  : 1.17459 V
+Vset - Vdac    : 0.02073 V
+Dac bits       : 945
+
+Vset expected  : 1.25267 V
+Vdac measured  : 1.23036 V
+Vset - Vdac    : 0.02231 V
+Dac bits       : 990
+
+Vset expected  : 1.30913 V
+Vdac measured  : 1.28820 V
+Vset - Vdac    : 0.02093 V
+Dac bits       : 1035
+
+Vset expected  : 1.36643 V
+Vdac measured  : 1.34469 V
+Vset - Vdac    : 0.02174 V
+Dac bits       : 1080
+
+Vset expected  : 1.42273 V
+Vdac measured  : 1.39995 V
+Vset - Vdac    : 0.02278 V
+Dac bits       : 1125
+
+Vset expected  : 1.47975 V
+Vdac measured  : 1.45704 V
+Vset - Vdac    : 0.02271 V
+Dac bits       : 1170
+
+Vset expected  : 1.53486 V
+Vdac measured  : 1.50990 V
+Vset - Vdac    : 0.02496 V
+Dac bits       : 1215
+
+Vset expected  : 1.59216 V
+Vdac measured  : 1.56666 V
+Vset - Vdac    : 0.02550 V
+Dac bits       : 1260
+
+Vset expected  : 1.64944 V
+Vdac measured  : 1.62144 V
+Vset - Vdac    : 0.02800 V
+Dac bits       : 1305
+
+Vset expected  : 1.70648 V
+Vdac measured  : 1.67832 V
+Vset - Vdac    : 0.02816 V
+Dac bits       : 1350
+
+Vset expected  : 1.76361 V
+Vdac measured  : 1.73373 V
+Vset - Vdac    : 0.02988 V
+Dac bits       : 1395
+
+Vset expected  : 1.82026 V
+Vdac measured  : 1.79127 V
+Vset - Vdac    : 0.02899 V
+Dac bits       : 1440
+
+Vset expected  : 1.87756 V
+Vdac measured  : 1.84686 V
+Vset - Vdac    : 0.03070 V
+Dac bits       : 1485
+
+Vset expected  : 1.93481 V
+Vdac measured  : 1.90572 V
+Vset - Vdac    : 0.02909 V
+Dac bits       : 1530
+
+Vset expected  : 1.99227 V
+Vdac measured  : 1.96014 V
+Vset - Vdac    : 0.03213 V
+Dac bits       : 1575
+
+Vset expected  : 2.04913 V
+Vdac measured  : 2.01546 V
+Vset - Vdac    : 0.03367 V
+Dac bits       : 1620
+
+Vset expected  : 2.10611 V
+Vdac measured  : 2.07102 V
+Vset - Vdac    : 0.03509 V
+Dac bits       : 1665
+
+Vset expected  : 2.16361 V
+Vdac measured  : 2.12682 V
+Vset - Vdac    : 0.03679 V
+Dac bits       : 1710
+
+Vset expected  : 2.22012 V
+Vdac measured  : 2.18406 V
+Vset - Vdac    : 0.03606 V
+Dac bits       : 1755
+
+Vset expected  : 2.27727 V
+Vdac measured  : 2.23941 V
+Vset - Vdac    : 0.03786 V
+Dac bits       : 1800
+
+Vset expected  : 2.33458 V
+Vdac measured  : 2.29785 V
+Vset - Vdac    : 0.03673 V
+Dac bits       : 1845
+
+Vset expected  : 2.39097 V
+Vdac measured  : 2.00751 V
+Vset - Vdac    : 0.38346 V
+Dac bits       : 1890
+
+Vset expected  : 2.45435 V
+Vdac measured  : 2.41965 V
+Vset - Vdac    : 0.03470 V
+Dac bits       : 1935
+
+Vset expected  : 2.50643 V
+Vdac measured  : 2.46699 V
+Vset - Vdac    : 0.03944 V
+Dac bits       : 1980
+
+Vset expected  : 2.56868 V
+Vdac measured  : 2.53098 V
+Vset - Vdac    : 0.03770 V
+Dac bits       : 2025
+
+Vset expected  : 2.62018 V
+Vdac measured  : 2.58222 V
+Vset - Vdac    : 0.03796 V
+Dac bits       : 2070
+
+Vset expected  : 2.68278 V
+Vdac measured  : 2.64708 V
+Vset - Vdac    : 0.03570 V
+Dac bits       : 2115
+
+Vset expected  : 2.73999 V
+Vdac measured  : 2.70360 V
+Vset - Vdac    : 0.03639 V
+Dac bits       : 2160
+
+Vset expected  : 2.79657 V
+Vdac measured  : 2.76138 V
+Vset - Vdac    : 0.03519 V
+Dac bits       : 2205
+
+Vset expected  : 2.85473 V
+Vdac measured  : 2.81706 V
+Vset - Vdac    : 0.03767 V
+Dac bits       : 2250
+
+Vset expected  : 2.91085 V
+Vdac measured  : 2.87511 V
+Vset - Vdac    : 0.03574 V
+Dac bits       : 2295
+
+Vset expected  : 2.96851 V
+Vdac measured  : 2.93103 V
+Vset - Vdac    : 0.03748 V
+Dac bits       : 2340
+
+Vset expected  : 3.30005 V
+Vdac measured  : 3.26475 V
+Vset - Vdac    : 0.03530 V
+Dac bits       : 2610
+
+Vset expected  : 3.35921 V
+Vdac measured  : 3.32313 V
+Vset - Vdac    : 0.03608 V
+Dac bits       : 2655
+
+Vset expected  : 3.41630 V
+Vdac measured  : 3.38190 V
+Vset - Vdac    : 0.03440 V
+Dac bits       : 2700
+
+Vset expected  : 3.47376 V
+Vdac measured  : 3.43839 V
+Vset - Vdac    : 0.03537 V
+Dac bits       : 2745
+
+Vset expected  : 3.52920 V
+Vdac measured  : 3.49473 V
+Vset - Vdac    : 0.03447 V
+Dac bits       : 2790
+
+Vset expected  : 3.58755 V
+Vdac measured  : 3.55134 V
+Vset - Vdac    : 0.03621 V
+Dac bits       : 2835
+
+Vset expected  : 3.64456 V
+Vdac measured  : 3.60819 V
+Vset - Vdac    : 0.03637 V
+Dac bits       : 2880
+
+Vset expected  : 3.69544 V
+Vdac measured  : 3.65820 V
+Vset - Vdac    : 0.03724 V
+Dac bits       : 2925
+
+Vset expected  : 3.75935 V
+Vdac measured  : 3.72351 V
+Vset - Vdac    : 0.03584 V
+Dac bits       : 2970
+
+Vset expected  : 3.81639 V
+Vdac measured  : 3.78030 V
+Vset - Vdac    : 0.03609 V
+Dac bits       : 3015
+
+Vset expected  : 3.87331 V
+Vdac measured  : 3.83841 V
+Vset - Vdac    : 0.03490 V
+Dac bits       : 3060
+
+Vset expected  : 3.93041 V
+Vdac measured  : 3.89433 V
+Vset - Vdac    : 0.03608 V
+Dac bits       : 3105
+
+Vset expected  : 3.98852 V
+Vdac measured  : 3.95148 V
+Vset - Vdac    : 0.03704 V
+Dac bits       : 3150
+
+Vset expected  : 4.04475 V
+Vdac measured  : 4.00806 V
+Vset - Vdac    : 0.03669 V
+Dac bits       : 3195
+
+Vset expected  : 4.10006 V
+Vdac measured  : 4.06197 V
+Vset - Vdac    : 0.03809 V
+Dac bits       : 3240
+
+Vset expected  : 4.15744 V
+Vdac measured  : 4.12218 V
+Vset - Vdac    : 0.03526 V
+Dac bits       : 3285
+
+Vset expected  : 4.21444 V
+Vdac measured  : 4.17915 V
+Vset - Vdac    : 0.03529 V
+Dac bits       : 3330
+
+Vset expected  : 4.27104 V
+Vdac measured  : 4.23528 V
+Vset - Vdac    : 0.03576 V
+Dac bits       : 3375
+
+Vset expected  : 4.32601 V
+Vdac measured  : 4.29102 V
+Vset - Vdac    : 0.03499 V
+Dac bits       : 3420
+
+Vset expected  : 4.37671 V
+Vdac measured  : 4.34385 V
+Vset - Vdac    : 0.03286 V
+Dac bits       : 3465
+
+Vset expected  : 4.43469 V
+Vdac measured  : 4.40046 V
+Vset - Vdac    : 0.03423 V
+Dac bits       : 3510
+
+Vset expected  : 4.49516 V
+Vdac measured  : 4.46427 V
+Vset - Vdac    : 0.03089 V
+Dac bits       : 3555
+
+Vset expected  : 4.55196 V
+Vdac measured  : 4.52211 V
+Vset - Vdac    : 0.02985 V
+Dac bits       : 3600
+
+Vset expected  : 4.60824 V
+Vdac measured  : 4.57881 V
+Vset - Vdac    : 0.02943 V
+Dac bits       : 3645
+
+Vset expected  : 4.66630 V
+Vdac measured  : 4.63719 V
+Vset - Vdac    : 0.02911 V
+Dac bits       : 3690
+
+Vset expected  : 4.71338 V
+Vdac measured  : 0.83286 V
+Vset - Vdac    : 3.88052 V
+Dac bits       : 3735
+
+Vset expected  : 4.77449 V
+Vdac measured  : 0.81066 V
+Vset - Vdac    : 3.96383 V
+Dac bits       : 3780
+
+Vset expected  : 4.82743 V
+Vdac measured  : 0.80031 V
+Vset - Vdac    : 4.02712 V
+Dac bits       : 3825
+
+Vset expected  : 4.88371 V
+Vdac measured  : 0.79218 V
+Vset - Vdac    : 4.09153 V
+Dac bits       : 3870
+
+Vset expected  : 4.94658 V
+Vdac measured  : 0.78315 V
+Vset - Vdac    : 4.16343 V
+Dac bits       : 3915
+
+Vset expected  : 5.00303 V
+Vdac measured  : 0.78162 V
+Vset - Vdac    : 4.22141 V
+Dac bits       : 3960
+
+Vset expected  : 5.06006 V
+Vdac measured  : 0.77553 V
+Vset - Vdac    : 4.28453 V
+Dac bits       : 4005
+
+Vset expected  : 5.11792 V
+Vdac measured  : 0.77358 V
+Vset - Vdac    : 4.34434 V
+Dac bits       : 4050
+
+Vset expected  : 0.05685 V
+Vdac measured  : 0.74535 V
+Vset - Vdac    : -0.68850 V
+Dac bits       : 45
+
+Vset expected  : 0.11360 V
+Vdac measured  : 0.75018 V
+Vset - Vdac    : -0.63658 V
+Dac bits       : 90
+
+Vset expected  : 0.17057 V
+Vdac measured  : 0.75651 V
+Vset - Vdac    : -0.58594 V
+Dac bits       : 135
+
+Vset expected  : 0.22743 V
+Vdac measured  : 0.75942 V
+Vset - Vdac    : -0.53199 V
+Dac bits       : 180
+
+Vset expected  : 0.28432 V
+Vdac measured  : 0.76233 V
+Vset - Vdac    : -0.47801 V
+Dac bits       : 225
+
+Vset expected  : 0.34115 V
+Vdac measured  : 0.76344 V
+Vset - Vdac    : -0.42229 V
+Dac bits       : 270
+
+Vset expected  : 0.39805 V
+Vdac measured  : 0.76422 V
+Vset - Vdac    : -0.36617 V
+Dac bits       : 315
+
+Vset expected  : 0.45438 V
+Vdac measured  : 0.76140 V
+Vset - Vdac    : -0.30702 V
+Dac bits       : 360
+
+Vset expected  : 0.51129 V
+Vdac measured  : 0.76419 V
+Vset - Vdac    : -0.25290 V
+Dac bits       : 405
+
+Vset expected  : 0.56872 V
+Vdac measured  : 0.76431 V
+Vset - Vdac    : -0.19559 V
+Dac bits       : 450
+
+Vset expected  : 0.62485 V
+Vdac measured  : 0.76551 V
+Vset - Vdac    : -0.14066 V
+Dac bits       : 495
+
+Vset expected  : 0.68224 V
+Vdac measured  : 0.76512 V
+Vset - Vdac    : -0.08288 V
+Dac bits       : 540
+
+Vset expected  : 0.73924 V
+Vdac measured  : 0.76626 V
+Vset - Vdac    : -0.02702 V
+Dac bits       : 585
+
+Vset expected  : 0.79526 V
+Vdac measured  : 0.76527 V
+Vset - Vdac    : 0.02999 V
+Dac bits       : 630
+
+Vset expected  : 0.85297 V
+Vdac measured  : 0.76668 V
+Vset - Vdac    : 0.08629 V
+Dac bits       : 675
+
+Vset expected  : 0.90976 V
+Vdac measured  : 0.76716 V
+Vset - Vdac    : 0.14260 V
+Dac bits       : 720
+
+Vset expected  : 0.96684 V
+Vdac measured  : 0.76851 V
+Vset - Vdac    : 0.19833 V
+Dac bits       : 765
+
+Vset expected  : 1.02366 V
+Vdac measured  : 0.76995 V
+Vset - Vdac    : 0.25371 V
+Dac bits       : 810
+
+Vset expected  : 1.07907 V
+Vdac measured  : 0.76992 V
+Vset - Vdac    : 0.30915 V
+Dac bits       : 855
+
+Vset expected  : 1.13585 V
+Vdac measured  : 0.76803 V
+Vset - Vdac    : 0.36782 V
+Dac bits       : 900
+
+Vset expected  : 1.19395 V
+Vdac measured  : 0.77109 V
+Vset - Vdac    : 0.42286 V
+Dac bits       : 945
+
+Vset expected  : 0.12093 V
+Vdac measured  : 1.22985 V
+Vset - Vdac    : -1.10892 V
+Dac bits       : 990
+
+Vset expected  : 1.30789 V
+Vdac measured  : 1.28658 V
+Vset - Vdac    : 0.02131 V
+Dac bits       : 1035
+
+Vset expected  : 1.36503 V
+Vdac measured  : 1.34358 V
+Vset - Vdac    : 0.02145 V
+Dac bits       : 1080
+
+Vset expected  : 1.42169 V
+Vdac measured  : 1.39860 V
+Vset - Vdac    : 0.02310 V
+Dac bits       : 1125
+
+Vset expected  : 1.47831 V
+Vdac measured  : 1.45518 V
+Vset - Vdac    : 0.02313 V
+Dac bits       : 1170
+
+Vset expected  : 1.53498 V
+Vdac measured  : 1.51020 V
+Vset - Vdac    : 0.02478 V
+Dac bits       : 1215
+
+Vset expected  : 1.59239 V
+Vdac measured  : 1.56678 V
+Vset - Vdac    : 0.02561 V
+Dac bits       : 1260
+
+Vset expected  : 1.65103 V
+Vdac measured  : 1.62387 V
+Vset - Vdac    : 0.02716 V
+Dac bits       : 1305
+
+Vset expected  : 1.70701 V
+Vdac measured  : 1.66008 V
+Vset - Vdac    : 0.04693 V
+Dac bits       : 1350
+
+Vset expected  : 1.76299 V
+Vdac measured  : 0.71427 V
+Vset - Vdac    : 1.04872 V
+Dac bits       : 1395
+
+Vset expected  : 1.81701 V
+Vdac measured  : 1.78818 V
+Vset - Vdac    : 0.02883 V
+Dac bits       : 1440
+
+Vset expected  : 1.87328 V
+Vdac measured  : 1.52733 V
+Vset - Vdac    : 0.34595 V
+Dac bits       : 1485
+
+Vset expected  : 1.93034 V
+Vdac measured  : 1.52796 V
+Vset - Vdac    : 0.40238 V
+Dac bits       : 1530
+
+Vset expected  : 1.98741 V
+Vdac measured  : 1.95528 V
+Vset - Vdac    : 0.03213 V
+Dac bits       : 1575
+
+Vset expected  : 2.04143 V
+Vdac measured  : 2.00742 V
+Vset - Vdac    : 0.03401 V
+Dac bits       : 1620
+
+Vset expected  : 2.10153 V
+Vdac measured  : 2.06664 V
+Vset - Vdac    : 0.03489 V
+Dac bits       : 1665
+
+Vset expected  : 2.15810 V
+Vdac measured  : 2.12184 V
+Vset - Vdac    : 0.03626 V
+Dac bits       : 1710
+
+Vset expected  : 2.21444 V
+Vdac measured  : 2.17878 V
+Vset - Vdac    : 0.03566 V
+Dac bits       : 1755
+
+Vset expected  : 2.27217 V
+Vdac measured  : 2.23413 V
+Vset - Vdac    : 0.03804 V
+Dac bits       : 1800
+
+Vset expected  : 2.32898 V
+Vdac measured  : 2.29218 V
+Vset - Vdac    : 0.03680 V
+Dac bits       : 1845
+
+Vset expected  : 2.38530 V
+Vdac measured  : 2.34696 V
+Vset - Vdac    : 0.03834 V
+Dac bits       : 1890
+
+Vset expected  : 2.44224 V
+Vdac measured  : 2.40498 V
+Vset - Vdac    : 0.03726 V
+Dac bits       : 1935
+
+Vset expected  : 2.49976 V
+Vdac measured  : 2.46009 V
+Vset - Vdac    : 0.03967 V
+Dac bits       : 1980
+
+Vset expected  : 2.55534 V
+Vdac measured  : 2.51778 V
+Vset - Vdac    : 0.03756 V
+Dac bits       : 2025
+
+Vset expected  : 2.61216 V
+Vdac measured  : 2.57358 V
+Vset - Vdac    : 0.03858 V
+Dac bits       : 2070
+
+Vset expected  : 2.66967 V
+Vdac measured  : 2.63223 V
+Vset - Vdac    : 0.03744 V
+Dac bits       : 2115
+
+Vset expected  : 2.72698 V
+Vdac measured  : 2.68887 V
+Vset - Vdac    : 0.03811 V
+Dac bits       : 2160
+
+Vset expected  : 2.78357 V
+Vdac measured  : 2.74695 V
+Vset - Vdac    : 0.03662 V
+Dac bits       : 2205
+
+Vset expected  : 2.84016 V
+Vdac measured  : 2.80116 V
+Vset - Vdac    : 0.03900 V
+Dac bits       : 2250
+
+Vset expected  : 2.89738 V
+Vdac measured  : 2.85837 V
+Vset - Vdac    : 0.03901 V
+Dac bits       : 2295
+
+Vset expected  : 2.95378 V
+Vdac measured  : 2.91477 V
+Vset - Vdac    : 0.03901 V
+Dac bits       : 2340
+
+Vset expected  : 3.01108 V
+Vdac measured  : 2.97081 V
+Vset - Vdac    : 0.04027 V
+Dac bits       : 2385
+
+Vset expected  : 3.06800 V
+Vdac measured  : 3.02808 V
+Vset - Vdac    : 0.03992 V
+Dac bits       : 2430
+
+Vset expected  : 3.12401 V
+Vdac measured  : 3.08523 V
+Vset - Vdac    : 0.03878 V
+Dac bits       : 2475
+
+Vset expected  : 3.18061 V
+Vdac measured  : 3.14367 V
+Vset - Vdac    : 0.03694 V
+Dac bits       : 2520
+
+Vset expected  : 3.23329 V
+Vdac measured  : 3.19881 V
+Vset - Vdac    : 0.03448 V
+Dac bits       : 2565
+
+Vset expected  : 3.29445 V
+Vdac measured  : 3.25911 V
+Vset - Vdac    : 0.03534 V
+Dac bits       : 2610
+
+Vset expected  : 3.35139 V
+Vdac measured  : 3.31602 V
+Vset - Vdac    : 0.03537 V
+Dac bits       : 2655
+
+Vset expected  : 3.40871 V
+Vdac measured  : 3.37383 V
+Vset - Vdac    : 0.03488 V
+Dac bits       : 2700
+
+Vset expected  : 3.46570 V
+Vdac measured  : 3.42960 V
+Vset - Vdac    : 0.03610 V
+Dac bits       : 2745
+
+Vset expected  : 3.52243 V
+Vdac measured  : 3.48786 V
+Vset - Vdac    : 0.03457 V
+Dac bits       : 2790
+
+Vset expected  : 3.57929 V
+Vdac measured  : 3.54255 V
+Vset - Vdac    : 0.03674 V
+Dac bits       : 2835
+
+Vset expected  : 3.63593 V
+Vdac measured  : 3.60069 V
+Vset - Vdac    : 0.03524 V
+Dac bits       : 2880
+
+Vset expected  : 3.69189 V
+Vdac measured  : 3.65514 V
+Vset - Vdac    : 0.03675 V
+Dac bits       : 2925
+
+Vset expected  : 3.74903 V
+Vdac measured  : 3.71211 V
+Vset - Vdac    : 0.03692 V
+Dac bits       : 2970
+
+Vset expected  : 3.80648 V
+Vdac measured  : 3.76959 V
+Vset - Vdac    : 0.03689 V
+Dac bits       : 3015
+
+Vset expected  : 3.86304 V
+Vdac measured  : 3.82566 V
+Vset - Vdac    : 0.03738 V
+Dac bits       : 3060
+
+Vset expected  : 3.91922 V
+Vdac measured  : 3.88317 V
+Vset - Vdac    : 0.03605 V
+Dac bits       : 3105
+
+Vset expected  : 3.97636 V
+Vdac measured  : 3.93861 V
+Vset - Vdac    : 0.03775 V
+Dac bits       : 3150
+
+Vset expected  : 4.03328 V
+Vdac measured  : 3.99729 V
+Vset - Vdac    : 0.03599 V
+Dac bits       : 3195
+
+Vset expected  : 4.08966 V
+Vdac measured  : 4.05210 V
+Vset - Vdac    : 0.03756 V
+Dac bits       : 3240
+
+Vset expected  : 4.14726 V
+Vdac measured  : 4.11273 V
+Vset - Vdac    : 0.03453 V
+Dac bits       : 3285
+
+Vset expected  : 4.20453 V
+Vdac measured  : 4.16952 V
+Vset - Vdac    : 0.03501 V
+Dac bits       : 3330
+
+Vset expected  : 4.26034 V
+Vdac measured  : 4.22658 V
+Vset - Vdac    : 0.03376 V
+Dac bits       : 3375
+
+Vset expected  : 4.31762 V
+Vdac measured  : 4.28316 V
+Vset - Vdac    : 0.03446 V
+Dac bits       : 3420
+
+Vset expected  : 4.37440 V
+Vdac measured  : 4.34172 V
+Vset - Vdac    : 0.03268 V
+Dac bits       : 3465
+
+Vset expected  : 4.43217 V
+Vdac measured  : 4.39890 V
+Vset - Vdac    : 0.03327 V
+Dac bits       : 3510
+
+Vset expected  : 4.48782 V
+Vdac measured  : 4.45620 V
+Vset - Vdac    : 0.03162 V
+Dac bits       : 3555
+
+Vset expected  : 4.54462 V
+Vdac measured  : 4.51488 V
+Vset - Vdac    : 0.02974 V
+Dac bits       : 3600
+
+Vset expected  : 4.60162 V
+Vdac measured  : 4.56960 V
+Vset - Vdac    : 0.03202 V
+Dac bits       : 3645
+
+Vset expected  : 4.65802 V
+Vdac measured  : 4.62963 V
+Vset - Vdac    : 0.02839 V
+Dac bits       : 3690
+
+Vset expected  : 4.71568 V
+Vdac measured  : 4.68420 V
+Vset - Vdac    : 0.03148 V
+Dac bits       : 3735
+
+Vset expected  : 4.77202 V
+Vdac measured  : 4.75764 V
+Vset - Vdac    : 0.01438 V
+Dac bits       : 3780
+
+Vset expected  : 4.82872 V
+Vdac measured  : 4.79328 V
+Vset - Vdac    : 0.03544 V
+Dac bits       : 3825
+
+Vset expected  : 4.88513 V
+Vdac measured  : 4.83954 V
+Vset - Vdac    : 0.04559 V
+Dac bits       : 3870
+
+Vset expected  : 4.94236 V
+Vdac measured  : 4.91832 V
+Vset - Vdac    : 0.02404 V
+Dac bits       : 3915
+
+Vset expected  : 4.99885 V
+Vdac measured  : 4.96500 V
+Vset - Vdac    : 0.03385 V
+Dac bits       : 3960
+
+Vset expected  : 5.05642 V
+Vdac measured  : 5.02809 V
+Vset - Vdac    : 0.02833 V
+Dac bits       : 4005
+
+Vset expected  : 5.11187 V
+Vdac measured  : 5.08275 V
+Vset - Vdac    : 0.02912 V
+Dac bits       : 4050
+
+Vset expected  : 0.05681 V
+Vdac measured  : 0.05502 V
+Vset - Vdac    : 0.00179 V
+Dac bits       : 45
+
+Vset expected  : 0.11363 V
+Vdac measured  : 0.11121 V
+Vset - Vdac    : 0.00242 V
+Dac bits       : 90
+
+Vset expected  : 0.17046 V
+Vdac measured  : 0.16758 V
+Vset - Vdac    : 0.00288 V
+Dac bits       : 135
+
+Vset expected  : 0.22720 V
+Vdac measured  : 0.22374 V
+Vset - Vdac    : 0.00346 V
+Dac bits       : 180
+
+Vset expected  : 0.28406 V
+Vdac measured  : 0.27894 V
+Vset - Vdac    : 0.00512 V
+Dac bits       : 225
+
+Vset expected  : 0.34047 V
+Vdac measured  : 0.33558 V
+Vset - Vdac    : 0.00489 V
+Dac bits       : 270
+
+Vset expected  : 0.39724 V
+Vdac measured  : 0.39015 V
+Vset - Vdac    : 0.00709 V
+Dac bits       : 315
+
+Vset expected  : 0.45409 V
+Vdac measured  : 0.44580 V
+Vset - Vdac    : 0.00829 V
+Dac bits       : 360
+
+Vset expected  : 0.51074 V
+Vdac measured  : 0.50007 V
+Vset - Vdac    : 0.01067 V
+Dac bits       : 405
+
+Vset expected  : 0.56732 V
+Vdac measured  : 0.60849 V
+Vset - Vdac    : -0.04117 V
+Dac bits       : 450
+
+Vset expected  : 0.62427 V
+Vdac measured  : 0.61587 V
+Vset - Vdac    : 0.00840 V
+Dac bits       : 495
+
+Vset expected  : 0.68155 V
+Vdac measured  : 0.70116 V
+Vset - Vdac    : -0.01961 V
+Dac bits       : 540
+
+Vset expected  : 0.73846 V
+Vdac measured  : 0.72552 V
+Vset - Vdac    : 0.01294 V
+Dac bits       : 585
+
+Vset expected  : 0.79445 V
+Vdac measured  : 0.78063 V
+Vset - Vdac    : 0.01382 V
+Dac bits       : 630
+
+Vset expected  : 0.85214 V
+Vdac measured  : 0.83730 V
+Vset - Vdac    : 0.01484 V
+Dac bits       : 675
+
+Vset expected  : 0.90801 V
+Vdac measured  : 0.89112 V
+Vset - Vdac    : 0.01689 V
+Dac bits       : 720
+
+Vset expected  : 0.96475 V
+Vdac measured  : 0.94719 V
+Vset - Vdac    : 0.01756 V
+Dac bits       : 765
+
+Vset expected  : 1.02117 V
+Vdac measured  : 1.00158 V
+Vset - Vdac    : 0.01959 V
+Dac bits       : 810
+
+Vset expected  : 1.07820 V
+Vdac measured  : 1.05936 V
+Vset - Vdac    : 0.01884 V
+Dac bits       : 855
+
+Vset expected  : 1.13593 V
+Vdac measured  : 1.11627 V
+Vset - Vdac    : 0.01966 V
+Dac bits       : 900
+
+Vset expected  : 1.19167 V
+Vdac measured  : 1.17000 V
+Vset - Vdac    : 0.02167 V
+Dac bits       : 945
+
+Vset expected  : 1.24845 V
+Vdac measured  : 1.22712 V
+Vset - Vdac    : 0.02133 V
+Dac bits       : 990
+
+Vset expected  : 1.30482 V
+Vdac measured  : 1.28367 V
+Vset - Vdac    : 0.02115 V
+Dac bits       : 1035
+
+Vset expected  : 1.36148 V
+Vdac measured  : 1.34016 V
+Vset - Vdac    : 0.02132 V
+Dac bits       : 1080
+
+Vset expected  : 1.41987 V
+Vdac measured  : 1.39731 V
+Vset - Vdac    : 0.02256 V
+Dac bits       : 1125
+
+Vset expected  : 1.47681 V
+Vdac measured  : 1.45377 V
+Vset - Vdac    : 0.02304 V
+Dac bits       : 1170
+
+Vset expected  : 1.53357 V
+Vdac measured  : 1.50882 V
+Vset - Vdac    : 0.02475 V
+Dac bits       : 1215
+
+Vset expected  : 1.59024 V
+Vdac measured  : 1.56534 V
+Vset - Vdac    : 0.02490 V
+Dac bits       : 1260
+
+Vset expected  : 1.64693 V
+Vdac measured  : 1.62069 V
+Vset - Vdac    : 0.02624 V
+Dac bits       : 1305
+
+Vset expected  : 1.70403 V
+Vdac measured  : 1.67610 V
+Vset - Vdac    : 0.02793 V
+Dac bits       : 1350
+
+Vset expected  : 1.76055 V
+Vdac measured  : 1.73190 V
+Vset - Vdac    : 0.02865 V
+Dac bits       : 1395
+
+Vset expected  : 1.81540 V
+Vdac measured  : 1.78743 V
+Vset - Vdac    : 0.02797 V
+Dac bits       : 1440
+
+Vset expected  : 1.87229 V
+Vdac measured  : 1.84266 V
+Vset - Vdac    : 0.02963 V
+Dac bits       : 1485
+
+Vset expected  : 1.92874 V
+Vdac measured  : 1.90002 V
+Vset - Vdac    : 0.02872 V
+Dac bits       : 1530
+
+Vset expected  : 1.98582 V
+Vdac measured  : 1.95453 V
+Vset - Vdac    : 0.03129 V
+Dac bits       : 1575
+
+Vset expected  : 2.04459 V
+Vdac measured  : 2.01150 V
+Vset - Vdac    : 0.03309 V
+Dac bits       : 1620
+
+Vset expected  : 2.10146 V
+Vdac measured  : 2.06730 V
+Vset - Vdac    : 0.03416 V
+Dac bits       : 1665
+
+Vset expected  : 2.15826 V
+Vdac measured  : 2.12232 V
+Vset - Vdac    : 0.03594 V
+Dac bits       : 1710
+
+Vset expected  : 2.21489 V
+Vdac measured  : 2.17989 V
+Vset - Vdac    : 0.03500 V
+Dac bits       : 1755
+
+Vset expected  : 2.27145 V
+Vdac measured  : 2.23512 V
+Vset - Vdac    : 0.03633 V
+Dac bits       : 1800
+
+Vset expected  : 2.32889 V
+Vdac measured  : 2.29245 V
+Vset - Vdac    : 0.03644 V
+Dac bits       : 1845
+
+Vset expected  : 2.38622 V
+Vdac measured  : 2.34846 V
+Vset - Vdac    : 0.03776 V
+Dac bits       : 1890
+
+Vset expected  : 2.44275 V
+Vdac measured  : 2.40588 V
+Vset - Vdac    : 0.03687 V
+Dac bits       : 1935
+
+Vset expected  : 2.49972 V
+Vdac measured  : 2.46063 V
+Vset - Vdac    : 0.03909 V
+Dac bits       : 1980
+
+Vset expected  : 2.55691 V
+Vdac measured  : 2.51889 V
+Vset - Vdac    : 0.03802 V
+Dac bits       : 2025
+
+Vset expected  : 2.61378 V
+Vdac measured  : 2.57499 V
+Vset - Vdac    : 0.03879 V
+Dac bits       : 2070
+
+Vset expected  : 2.67059 V
+Vdac measured  : 2.63340 V
+Vset - Vdac    : 0.03719 V
+Dac bits       : 2115
+
+Vset expected  : 2.72764 V
+Vdac measured  : 2.69007 V
+Vset - Vdac    : 0.03757 V
+Dac bits       : 2160
+
+Vset expected  : 2.78292 V
+Vdac measured  : 2.74680 V
+Vset - Vdac    : 0.03612 V
+Dac bits       : 2205
+
+Vset expected  : 2.84121 V
+Vdac measured  : 2.80245 V
+Vset - Vdac    : 0.03876 V
+Dac bits       : 2250
+
+Vset expected  : 2.89742 V
+Vdac measured  : 2.85897 V
+Vset - Vdac    : 0.03845 V
+Dac bits       : 2295
+
+Vset expected  : 2.95462 V
+Vdac measured  : 2.91486 V
+Vset - Vdac    : 0.03976 V
+Dac bits       : 2340
+
+Vset expected  : 3.01139 V
+Vdac measured  : 2.97168 V
+Vset - Vdac    : 0.03971 V
+Dac bits       : 2385
+
+Vset expected  : 3.06796 V
+Vdac measured  : 3.02853 V
+Vset - Vdac    : 0.03943 V
+Dac bits       : 2430
+
+Vset expected  : 3.12456 V
+Vdac measured  : 3.08553 V
+Vset - Vdac    : 0.03903 V
+Dac bits       : 2475
+
+Vset expected  : 3.18236 V
+Vdac measured  : 3.14544 V
+Vset - Vdac    : 0.03692 V
+Dac bits       : 2520
+
+Vset expected  : 3.23874 V
+Vdac measured  : 3.20397 V
+Vset - Vdac    : 0.03477 V
+Dac bits       : 2565
+
+Vset expected  : 3.29522 V
+Vdac measured  : 3.26094 V
+Vset - Vdac    : 0.03428 V
+Dac bits       : 2610
+
+Vset expected  : 3.35300 V
+Vdac measured  : 3.31749 V
+Vset - Vdac    : 0.03551 V
+Dac bits       : 2655
+
+Vset expected  : 3.40873 V
+Vdac measured  : 3.37440 V
+Vset - Vdac    : 0.03433 V
+Dac bits       : 2700
+
+Vset expected  : 3.46616 V
+Vdac measured  : 3.43071 V
+Vset - Vdac    : 0.03545 V
+Dac bits       : 2745
+
+Vset expected  : 3.52376 V
+Vdac measured  : 3.48924 V
+Vset - Vdac    : 0.03452 V
+Dac bits       : 2790
+
+Vset expected  : 3.58062 V
+Vdac measured  : 3.54459 V
+Vset - Vdac    : 0.03603 V
+Dac bits       : 2835
+
+Vset expected  : 3.63671 V
+Vdac measured  : 3.60177 V
+Vset - Vdac    : 0.03494 V
+Dac bits       : 2880
+
+Vset expected  : 3.69349 V
+Vdac measured  : 3.65700 V
+Vset - Vdac    : 0.03649 V
+Dac bits       : 2925
+
+Vset expected  : 3.75042 V
+Vdac measured  : 3.71361 V
+Vset - Vdac    : 0.03681 V
+Dac bits       : 2970
+
+Vset expected  : 3.80679 V
+Vdac measured  : 3.77052 V
+Vset - Vdac    : 0.03627 V
+Dac bits       : 3015
+
+Vset expected  : 3.86320 V
+Vdac measured  : 3.82659 V
+Vset - Vdac    : 0.03661 V
+Dac bits       : 3060
+
+Vset expected  : 3.92113 V
+Vdac measured  : 3.88449 V
+Vset - Vdac    : 0.03664 V
+Dac bits       : 3105
+
+Vset expected  : 3.97285 V
+Vdac measured  : 3.93525 V
+Vset - Vdac    : 0.03760 V
+Dac bits       : 3150
+
+Vset expected  : 4.02996 V
+Vdac measured  : 3.99405 V
+Vset - Vdac    : 0.03591 V
+Dac bits       : 3195
+
+Vset expected  : 4.08781 V
+Vdac measured  : 4.05012 V
+Vset - Vdac    : 0.03769 V
+Dac bits       : 3240
+
+Vset expected  : 4.14752 V
+Vdac measured  : 4.11231 V
+Vset - Vdac    : 0.03521 V
+Dac bits       : 3285
+
+Vset expected  : 4.20009 V
+Vdac measured  : 4.16580 V
+Vset - Vdac    : 0.03429 V
+Dac bits       : 3330
+
+Vset expected  : 4.25613 V
+Vdac measured  : 4.22289 V
+Vset - Vdac    : 0.03324 V
+Dac bits       : 3375
+
+Vset expected  : 4.31830 V
+Vdac measured  : 4.28331 V
+Vset - Vdac    : 0.03499 V
+Dac bits       : 3420
+
+Vset expected  : 4.37430 V
+Vdac measured  : 4.34076 V
+Vset - Vdac    : 0.03354 V
+Dac bits       : 3465
+
+Vset expected  : 4.43160 V
+Vdac measured  : 4.39830 V
+Vset - Vdac    : 0.03330 V
+Dac bits       : 3510
+
+Vset expected  : 4.48836 V
+Vdac measured  : 4.45536 V
+Vset - Vdac    : 0.03300 V
+Dac bits       : 3555
+
+Vset expected  : 4.54505 V
+Vdac measured  : 4.51407 V
+Vset - Vdac    : 0.03098 V
+Dac bits       : 3600
+
+Vset expected  : 4.60135 V
+Vdac measured  : 4.57095 V
+Vset - Vdac    : 0.03040 V
+Dac bits       : 3645
+
+Vset expected  : 4.65829 V
+Vdac measured  : 4.62969 V
+Vset - Vdac    : 0.02860 V
+Dac bits       : 3690
+
+Vset expected  : 4.71622 V
+Vdac measured  : 4.68357 V
+Vset - Vdac    : 0.03265 V
+Dac bits       : 3735
+
+Vset expected  : 4.77233 V
+Vdac measured  : 4.75545 V
+Vset - Vdac    : 0.01688 V
+Dac bits       : 3780
+
+Vset expected  : 4.82897 V
+Vdac measured  : 4.79322 V
+Vset - Vdac    : 0.03575 V
+Dac bits       : 3825
+
+Vset expected  : 4.88575 V
+Vdac measured  : 4.84053 V
+Vset - Vdac    : 0.04522 V
+Dac bits       : 3870
+
+Vset expected  : 4.94363 V
+Vdac measured  : 4.92003 V
+Vset - Vdac    : 0.02360 V
+Dac bits       : 3915
+
+Vset expected  : 5.00019 V
+Vdac measured  : 4.96623 V
+Vset - Vdac    : 0.03396 V
+Dac bits       : 3960
+
+Vset expected  : 5.05727 V
+Vdac measured  : 5.02827 V
+Vset - Vdac    : 0.02900 V
+Dac bits       : 4005
+
+Vset expected  : 5.11422 V
+Vdac measured  : 5.08371 V
+Vset - Vdac    : 0.03051 V
+Dac bits       : 4050
+
+Vset expected  : 0.05682 V
+Vdac measured  : 0.05493 V
+Vset - Vdac    : 0.00189 V
+Dac bits       : 45
+
+Vset expected  : 0.11367 V
+Vdac measured  : 0.11175 V
+Vset - Vdac    : 0.00192 V
+Dac bits       : 90
