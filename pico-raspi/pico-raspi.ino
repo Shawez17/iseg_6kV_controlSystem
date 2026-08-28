@@ -1,175 +1,111 @@
-#include "Arduino.h"
-#include <Wire.h>
+#include "Arduino.h" 
 #include <Adafruit_ADS1X15.h>
+#include <Wire.h>
+//#include <Adafruit_MCP4725.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Adafruit_MCP4725.h>
-
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
-#define OLED_ADDR 0x3C
-
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
-Adafruit_ADS1115 ads1;
-
-const uint8_t ADC_CHANNEL_0 = 0;
-const uint8_t ADC_CHANNEL_1 = 1;
-const uint8_t ADC_CHANNEL_2 = 2;
-
-const float ADS_LSB_VOLTS = 0.0001875;
-
-Adafruit_MCP4725 dac;
-
-const uint8_t MCP_ADDR = 0x60;
-const uint16_t MAX_DAC_BITS = 4095;
-
-uint16_t dacSetValue;
-
-float V_set_dac;
 
 const uint16_t NUM_SAMPLES = 100;
 const uint16_t SAMPLE_DELAY_MS = 0;
+const uint16_t SETTLE_DELAY_MS = 2;
+const float ADS_LSB_VOLTS = 0.0001875;
 
-void setup() {
 
+#define LED_GPIO 25
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define ADC_ADDRESS 0x48 ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
+Adafruit_ADS1115 ads1;  /* Use this for the 16-bit version */
+
+
+void setup(){
   Serial.begin(115200);
-  delay(1000);
+  Serial.println("Binsoir elliot!");
+  pinMode(LED_GPIO,OUTPUT);
 
-  Wire.setSDA(20);
   Wire.setSCL(21);
+  Wire.setSDA(20);
   Wire.begin();
 
-  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
-    Serial.println("OLED not found!");
-    while (1) {
-      delay(10);
-    }
+  delay(500);
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    //for(;;); // Don't proceed, loop forever
   }
-
-  display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(0, 0);
-
-  display.println("Init...");
   display.display();
-
-  if (!ads1.begin(0x48)) {
-    Serial.println("ADS1115 not found!");
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.println("ADS1115 ERROR");
-    display.display();
-
-    while (1) {
-      delay(10);
-    }
-  }
-
-  ads1.setGain(GAIN_TWOTHIRDS);
-
-  if (!dac.begin(MCP_ADDR)) {
-    Serial.println("MCP4725 not found!");
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.println("MCP4725 ERROR");
-    display.display();
-
-    while (1) {
-      delay(10);
-    }
-  }
-
-  dacSetValue = 2000;
-
-  dac.setVoltage(dacSetValue, false);
-
-  Serial.println();
-  Serial.print("DAC bits: ");
-  Serial.println(dacSetValue);
-
+  delay(2000); // Pause for 2 seconds
   display.clearDisplay();
+  display.drawPixel(10, 10, SSD1306_WHITE);
 
-  display.display();
+  ads.setGain(GAIN_TWOTHIRDS);
+  //ads1.setGain(GAIN_TWOTHIRDS);
 
-  delay(1500);
-}
+  if (!ads.begin()) {
+    Serial.println("Failed to initialize ADS.");
+    //while (1);
+  }
+  //if (!ads1.begin()) {
+  //  Serial.println("Failed to initialize ADS.");
+    //while (1);
+  }
 
-void loop() {
 
-  long sum0 = 0;
-  long sum1 = 0;
-  long sum2 = 0;
+
+
+
+void loop(void){
+  digitalWrite(LED_GPIO, HIGH);
+  delay(1000);
+  int sum0_23=0;
 
   for (uint16_t i = 0; i < NUM_SAMPLES; i++) {
 
-    sum0 += ads1.readADC_SingleEnded(ADC_CHANNEL_0);
-    sum1 += ads1.readADC_SingleEnded(ADC_CHANNEL_1);
-    sum2 += ads1.readADC_SingleEnded(ADC_CHANNEL_2);
+ //     sum0_1 += ads.readADC_Differential_0_3();//
+ //     sum0_2 += ads.readADC_Differential_1_3();//
+      sum0_23 += ads.readADC_Differential_2_3();// 
 
-    if (SAMPLE_DELAY_MS > 0) {
-      delay(SAMPLE_DELAY_MS);
+ //     sum1_1 += ads2.readADC_Differential_0_3();//Vset_adc
+      //sum1_2 += ads1.readADC_Differential_1_3();//Vref
+ //     sum1_3 += ads2.readADC_Differential_2_3();//Vgnd
+
+      if (SAMPLE_DELAY_MS > 0) {
+        delay(SAMPLE_DELAY_MS);
+      }
     }
-  }
 
-  float avgRaw0 = (float)sum0 / NUM_SAMPLES;
-  float avgRaw1 = (float)sum1 / NUM_SAMPLES;
-  float avgRaw2 = (float)sum2 / NUM_SAMPLES;
+//    float avgRaw0_1 = (float)sum0_1 / NUM_SAMPLES;
+  //  float avgRaw0_2 = (float)sum0_2 / NUM_SAMPLES;
+  float avgRaw0_23 = (float)sum0_23 / NUM_SAMPLES;
+  //  float avgRaw1_1 = (float)sum1_1 / NUM_SAMPLES;
+    //float avgRaw1_2 = (float)sum1_2 / NUM_SAMPLES;
+  //  float avgRaw1_3 = (float)sum1_3 / NUM_SAMPLES;
 
-  float V_ads1_a0 = avgRaw0 * ADS_LSB_VOLTS;
-  float V_ads1_a1 = avgRaw1 * ADS_LSB_VOLTS;
-  float V_ads1_a2 = avgRaw2 * ADS_LSB_VOLTS;
 
-  float diff3_V_ref = V_ads1_a2 - V_ads1_a1;
 
-  float diff2 = V_ads1_a0 - V_ads1_a1;
+    //float V_ads_a1 = avgRaw0_1 * ADS_LSB_VOLTS;
+    //float V_ads_a2 = avgRaw0_2 * ADS_LSB_VOLTS;
+  float V_ads_23 = avgRaw0_23 * ADS_LSB_VOLTS;
 
-  V_set_dac =
-      diff3_V_ref *
-      ((float)dacSetValue / MAX_DAC_BITS);
-
-  float diff1 = V_set_dac - diff2;
-
-  Serial.print("Vset expected  : ");
-  Serial.print(V_set_dac, 5);
-  Serial.println(" V");
-
-  Serial.print("Vdac measured  : ");
-  Serial.print(diff2, 5);
-  Serial.println(" V");
-
-  Serial.print("Vset - Vdac    : ");
-  Serial.print(diff1, 5);
-  Serial.println(" V");
-
-  Serial.println();
-
+    //float V_ads2_a1 = avgRaw1_1 * ADS_LSB_VOLTS;
+    //float V_ads2_a2 = avgRaw1_2 * ADS_LSB_VOLTS;
+    //float V_ads2_a3 = avgRaw1_3 * ADS_LSB_VOLTS;
+  display.display();
+  delay(2000); // Pause for 2 seco
+  Serial.print(V_ads_23,5); 
+  Serial.print(" , "); 
+  Serial.println(avgRaw0_23,2);   
+  
   display.clearDisplay();
 
-  display.setTextSize(1);
 
-  display.setCursor(0, 0);
-  display.print("Vset: ");
-  display.print(V_set_dac, 3);
-  display.println(" V");
+  delay(5000);
 
-  display.setCursor(0, 16);
-  display.print("Vadc: ");
-  display.print(diff2, 3);
-  display.println(" V");
 
-  display.setCursor(0, 32);
-  display.print("Error: ");
-  display.print(diff1, 3);
-  display.println(" V");
-
-  display.setCursor(0, 48);
-  display.print("Vref: ");
-  display.print(diff3_V_ref, 3);
-  display.println(" V");
-
-  display.display();
-
-  delay(30000);
 }
+
+

@@ -1,3 +1,5 @@
+V_mm=2.496V
+
 Vset expected  : 2.52828 V
 Vdac measured  : 2.48955 V
 Vset - Vdac    : 0.03873 V
