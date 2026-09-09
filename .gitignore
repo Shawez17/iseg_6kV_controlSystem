@@ -1,0 +1,37 @@
+# Arduino IDE / AVR / ESP / RP2040 build outputs
+build/
+**/build/
+*.hex
+*.elf
+*.eep
+*.bin
+*.uf2
+*.map
+*.d
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# KiCad backup and cache files
+*.kicad_prl
+*.kicad_sch-bak
+*.kicad_pcb-bak
+*-backups/
+fp-info-cache/
+*.tmp
+*.bak
+*.lck
