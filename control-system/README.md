@@ -17,3 +17,10 @@ The project is organized into a small Arduino-style modular layout:
 
 
 ## Serial commands
+
+- `DEBUG` enables debug mode.
+- `STOP` disables debug mode.
+- `DAC?` prints the current DAC codes.
+- `DAC0=<0-32767>` updates DAC channel 0.
+- `DAC1=<0-32767>` updates DAC channel 1.
+- `DAC=<code0>,<code1>` updates both DAC channels together.

@@ -7,4 +7,4 @@
 #include "state.h"
 
 void initDisplay(Adafruit_ST7789& tft);
-void renderStatus(Adafruit_ST7789& tft, const SystemState& state);
+void renderDisplay(Adafruit_ST7789& tft, const SystemState& state);

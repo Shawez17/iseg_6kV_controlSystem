@@ -4,4 +4,9 @@
 
 #include "state.h"
 
-void handleSerialCommands(Stream& serial, SystemState& state);
+enum class CommandSource : uint8_t {
+	Usb,
+	Ethernet,
+};
+
+void handleSerialCommands(Stream& serial, SystemState& state, CommandSource source);

@@ -3,10 +3,10 @@
 #include "config.h"
 #include "state.h"
 #include "hardware_i2c.h"
-#include "adc_readout.h"
-#include "dac_control.h"
 #include "display_ui.h"
 #include "serial_commands.h"
+#include "transport_control.h"
+#include "network_transport.h"
 
 Adafruit_ADS1115 adsPositive;
 Adafruit_ADS1115 adsNegative;
@@ -32,12 +32,17 @@ void setup() {
   SPI1.setCS(TFT_CS);
 
   initDisplay(tft);
+  setupModeSelectPins();
   setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
   scanI2cDevices(Wire1);
 
   setupAdcModule(adsPositive, adsNegative);
-  setupDacModule(gp8413);
+  setupDacModule(gp8413, systemState);
 
+  initNetworkTransport(systemState);
+
+  systemState.transport_mode = TransportMode::Usb;
+  systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
   Serial.println("System ready.");
 }
@@ -46,12 +51,17 @@ void loop() {
   static unsigned long lastDisplayUpdateMs = 0;
 
   digitalWrite(LED_GPIO, HIGH);
-  handleSerialCommands(Serial, systemState);
+  updateTransportMode(systemState);
+  updateDisplayMode(systemState);
+  handleSerialCommands(Serial, systemState, CommandSource::Usb);
+  if (systemState.transport_mode == TransportMode::Ethernet) {
+    pollNetworkTransport(systemState);
+  }
   updateAdcReadings(adsPositive, adsNegative, systemState);
   updateDacOutputs(gp8413, systemState);
 
-  if (systemState.debug_mode && (millis() - lastDisplayUpdateMs > 250)) {
-    renderStatus(tft, systemState);
+  if (millis() - lastDisplayUpdateMs > 250) {
+    renderDisplay(tft, systemState);
     lastDisplayUpdateMs = millis();
   }
 
