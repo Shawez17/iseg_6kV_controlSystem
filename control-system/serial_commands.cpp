@@ -32,6 +32,7 @@ bool parseChannelAndValue(const String& payload, uint8_t& channel, float& value)
   }
 }
 
+}
 namespace {
 
 uint16_t clampDacCode(long value) {
@@ -213,4 +214,6 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
   } else {
     serial.println("ERROR");
   }
-}
+    }
+    
+

@@ -38,7 +38,11 @@ constexpr uint8_t TREND_SAMPLES = 32;
 // constexpr int WIZNET_CS_PIN = -1;   // Chip-select for WIZnet SPI (if required)
 // constexpr int WIZNET_RST_PIN = -1;  // Reset pin for WIZnet (if required)
 // constexpr int WIZNET_INT_PIN = -1;  // Interrupt pin from WIZnet (optional)
+<<<<<<< HEAD
 
+=======
+// 
+>>>>>>> 7e5636d (Initialtes 11-09-26_Wire1)
 
 // Network defaults — update these to match your network. If not set,
 // the network transport will remain a no-op unless compiled with

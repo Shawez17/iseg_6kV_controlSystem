@@ -33,8 +33,8 @@ void setup() {
 
   initDisplay(tft);
   setupModeSelectPins();
-  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
   scanI2cDevices(Wire1);
+  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
 
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);

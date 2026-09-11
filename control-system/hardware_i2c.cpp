@@ -34,16 +34,20 @@ void scanI2cDevices(TwoWire& bus) {
 
 
 void setupAdcModule(Adafruit_ADS1115& positive, Adafruit_ADS1115& negative) {
-  if (!positive.begin()) {
+  if (positive.begin(), &Wire1) {
+    Serial.println("Positive ADC has initialize.");
+  }else{
     Serial.println("Positive ADC failed to initialize.");
   }
 
-  if (!negative.begin()) {
+  if (!negative.begin(), &Wire1) {
+    Serial.println("Negative ADC has initialize.");
+  }else{
     Serial.println("Negative ADC failed to initialize.");
   }
 
-  positive.setGain(GAIN_ONE);
-  negative.setGain(GAIN_ONE);
+  positive.setGain(GAIN_TWOTHIRDS);
+  negative.setGain(GAIN_TWOTHIRDS);
 }
 
 void updateAdcReadings(Adafruit_ADS1115& positive,
