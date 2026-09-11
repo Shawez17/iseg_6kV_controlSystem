@@ -19,7 +19,7 @@ void setup() {
   pinMode(LED_GPIO, OUTPUT);
   digitalWrite(LED_GPIO, LOW);
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial) {
     delay(10);
   }

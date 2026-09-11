@@ -29,6 +29,7 @@ bool parseChannelAndValue(const String& payload, uint8_t& channel, float& value)
   channel = static_cast<uint8_t>(channelText.toInt());
   value = valueText.toFloat();
   return (channel == 1 || channel == 2);
+  }
 }
 
 namespace {

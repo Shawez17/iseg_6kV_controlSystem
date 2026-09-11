@@ -35,9 +35,9 @@ constexpr uint16_t SETTLE_DELAY_MS = 2;
 constexpr uint8_t TREND_SAMPLES = 32;
 
 // WIZnet / Ethernet hardware pins (placeholders). Fill when wiring is known.
-constexpr int WIZNET_CS_PIN = -1;   // Chip-select for WIZnet SPI (if required)
-constexpr int WIZNET_RST_PIN = -1;  // Reset pin for WIZnet (if required)
-constexpr int WIZNET_INT_PIN = -1;  // Interrupt pin from WIZnet (optional)
+// constexpr int WIZNET_CS_PIN = -1;   // Chip-select for WIZnet SPI (if required)
+// constexpr int WIZNET_RST_PIN = -1;  // Reset pin for WIZnet (if required)
+// constexpr int WIZNET_INT_PIN = -1;  // Interrupt pin from WIZnet (optional)
 
 
 // Network defaults — update these to match your network. If not set,
