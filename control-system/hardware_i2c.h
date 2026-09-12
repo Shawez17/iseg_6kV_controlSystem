@@ -16,3 +16,5 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
                        SystemState& state);
 void setupDacModule(DFRobot_GP8XXX_IIC& dac, SystemState& state);
 void updateDacOutputs(DFRobot_GP8XXX_IIC& dac, const SystemState& state);
+void flush_to_serial(const SystemState& state);
+

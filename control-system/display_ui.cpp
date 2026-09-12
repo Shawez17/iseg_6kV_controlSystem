@@ -80,13 +80,14 @@ void drawTrendGraph(Adafruit_ST7789& tft,
 
 void initDisplay(Adafruit_ST7789& tft) {
   tft.init(240, 320);
-  tft.setRotation(1);
+  tft.setRotation(-1);
   tft.fillScreen(ST77XX_BLACK);
-  tft.setCursor(40, 100);
+  tft.setCursor(30, 100);
   tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(3);
-  tft.println("HV Supply");
+  tft.setTextSize(2);
+  tft.println("There is only one god given ground");
 }
+
 
 void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
   if (state.display_mode == DisplayMode::Trend) {

@@ -33,9 +33,8 @@ void setup() {
 
   initDisplay(tft);
   setupModeSelectPins();
+  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN); 
   scanI2cDevices(Wire1);
-  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
-
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);
 
@@ -44,27 +43,43 @@ void setup() {
   systemState.transport_mode = TransportMode::Usb;
   systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
-  Serial.println("System ready.");
+  Serial.println("Setup is done\nSystem ready.");
 }
 
 void loop() {
-  static unsigned long lastDisplayUpdateMs = 0;
 
   digitalWrite(LED_GPIO, HIGH);
-  updateTransportMode(systemState);
-  updateDisplayMode(systemState);
-  handleSerialCommands(Serial, systemState, CommandSource::Usb);
-  if (systemState.transport_mode == TransportMode::Ethernet) {
-    pollNetworkTransport(systemState);
-  }
-  updateAdcReadings(adsPositive, adsNegative, systemState);
-  updateDacOutputs(gp8413, systemState);
-
-  if (millis() - lastDisplayUpdateMs > 250) {
-    renderDisplay(tft, systemState);
-    lastDisplayUpdateMs = millis();
-  }
-
+  delay(1000);
   digitalWrite(LED_GPIO, LOW);
+  delay(1000);
+  Serial.println("in the loop");
+  static unsigned long lastDisplayUpdateMs = 0;
+  updateTransportMode(systemState);
+  Serial.println("in the loop_1");
+  updateDisplayMode(systemState);
+  Serial.println("in the loop_2, yay!");
+  handleSerialCommands(Serial, systemState, CommandSource::Usb); 
+  Serial.println("in the loop_3, yay! again , serial works");
+  //if (systemState.transport_mode == TransportMode::Ethernet) {
+  //  pollNetworkTransport(systemState);
+  //
+  //}
+  updateDacOutputs(gp8413, systemState);
+  Serial.println("in the loop_3.1, dac updates");
+  renderDisplay(tft, systemState);
+  Serial.println("in the loop_3.1, tft updates");
+
+  updateAdcReadings(adsPositive, adsNegative, systemState);
+  Serial.println("in the loop_3.1, adc updates");
+    //if (millis() - lastDisplayUpdateMs > 250) {
+   //if (millis() - lastDisplayUpdateMs > 250) {
+  //  lastDisplayUpdateMs = millis();
+  //}
+  
+  
+  flush_to_serial(systemState);
+  Serial.println("in the loop_4, yay! again , ethernet works! works");
+  digitalWrite(LED_GPIO, HIGH);
+  Serial.println("in the loop_5, yay! again , all works");
   delay(50);
 }
