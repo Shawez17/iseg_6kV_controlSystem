@@ -26,9 +26,9 @@ void setup() {
 
   Serial.println("Starting HV control system...");
 
-  SPI1.setSCK(10);
-  SPI1.setTX(11);
-  SPI1.setRX(12);
+  SPI1.setSCK(TFT_SCK);
+  SPI1.setTX(TFT_TX);
+  SPI1.setRX(TFT_RX);
   SPI1.setCS(TFT_CS);
 
   initDisplay(tft);

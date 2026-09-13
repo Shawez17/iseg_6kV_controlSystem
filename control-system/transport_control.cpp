@@ -2,13 +2,9 @@
 
 #include "config.h"
 
-namespace {
-
-bool isSelectablePin(int pin) {
+static bool isSelectablePin(int pin) {
   return pin >= 0;
 }
-
-}  // namespace
 
 void setupModeSelectPins() {
   if (isSelectablePin(TRANSPORT_SEL_PIN)) {

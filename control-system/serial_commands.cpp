@@ -2,23 +2,21 @@
 
 #include "config.h"
 
-namespace {
-
-bool isVoltageCommand(const String& command) {
+static bool isVoltageCommand(const String& command) {
   return command.startsWith("SOUR:VOLT") || command.startsWith("MEAS:VOLT") || command.startsWith("CONF:IP");
 }
 
-bool isDebugDacCommand(const String& command) {
+static bool isDebugDacCommand(const String& command) {
   return command == "DAC?" || command.startsWith("DAC0=") || command.startsWith("DAC1=") || command.startsWith("DAC=") || command.startsWith("SOUR:DAC");
 }
 
-uint16_t voltageToDacCode(float volts) {
+static uint16_t voltageToDacCode(float volts) {
   const float limitedVolts = constrain(volts, 0.0f, VSET_MAX_VOLTS);
   const float normalized = limitedVolts / VSET_MAX_VOLTS;
   return static_cast<uint16_t>(normalized * static_cast<float>(MAX_DAC_BITS));
 }
 
-bool parseChannelAndValue(const String& payload, uint8_t& channel, float& value) {
+static bool parseChannelAndValue(const String& payload, uint8_t& channel, float& value) {
   const int commaIndex = payload.indexOf(',');
   if (commaIndex < 0) {
     return false;
@@ -29,10 +27,8 @@ bool parseChannelAndValue(const String& payload, uint8_t& channel, float& value)
   channel = static_cast<uint8_t>(channelText.toInt());
   value = valueText.toFloat();
   return (channel == 1 || channel == 2);
-  }
 }
 
-}
 namespace {
 
 uint16_t clampDacCode(long value) {
@@ -47,7 +43,7 @@ uint16_t clampDacCode(long value) {
   return static_cast<uint16_t>(value);
 }
 
-bool parseDacAssignment(const String& payload, uint16_t& code) {
+static bool parseDacAssignment(const String& payload, uint16_t& code) {
   char* endPtr = nullptr;
   long parsedValue = strtol(payload.c_str(), &endPtr, 10);
 
@@ -59,18 +55,16 @@ bool parseDacAssignment(const String& payload, uint16_t& code) {
   return true;
 }
 
-void printDacCodes(Stream& serial, const SystemState& state) {
+static void printDacCodes(Stream& serial, const SystemState& state) {
   serial.print("DAC_CODE_0=");
   serial.print(state.dac_code_0);
   serial.print(", DAC_CODE_1=");
   serial.println(state.dac_code_1);
 }
 
-const char* transportText(TransportMode mode) {
+static const char* transportText(TransportMode mode) {
   return (mode == TransportMode::Ethernet) ? "ETHERNET" : "USB";
 }
-
-}  // namespace
 
 void handleSerialCommands(Stream& serial, SystemState& state, CommandSource source) {
   if (serial.available() <= 0) {

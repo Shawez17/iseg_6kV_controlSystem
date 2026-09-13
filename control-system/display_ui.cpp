@@ -1,20 +1,18 @@
 #include "display_ui.h"
 
-namespace {
-
-const char* transportModeText(TransportMode mode) {
+static const char* transportModeText(TransportMode mode) {
   return (mode == TransportMode::Ethernet) ? "ETH" : "USB";
 }
 
-const char* displayModeText(DisplayMode mode) {
+static const char* displayModeText(DisplayMode mode) {
   return (mode == DisplayMode::Trend) ? "TREND" : "LIVE";
 }
 
-uint8_t trendSampleCount(const SystemState& state) {
+static uint8_t trendSampleCount(const SystemState& state) {
   return state.trend_full ? TREND_SAMPLES : state.trend_head;
 }
 
-uint8_t trendIndexFromOldest(const SystemState& state, uint8_t offset) {
+static uint8_t trendIndexFromOldest(const SystemState& state, uint8_t offset) {
   const uint8_t count = trendSampleCount(state);
   if (count == 0) {
     return 0;
@@ -23,14 +21,14 @@ uint8_t trendIndexFromOldest(const SystemState& state, uint8_t offset) {
   return static_cast<uint8_t>((state.trend_full ? state.trend_head : 0) + offset) % TREND_SAMPLES;
 }
 
-void drawTrendGraph(Adafruit_ST7789& tft,
-                    int16_t x,
-                    int16_t y,
-                    int16_t w,
-                    int16_t h,
-                    const SystemState& state,
-                    const float* a,
-                    const float* b) {
+static void drawTrendGraph(Adafruit_ST7789& tft,
+                          int16_t x,
+                          int16_t y,
+                          int16_t w,
+                          int16_t h,
+                          const SystemState& state,
+                          const float* a,
+                          const float* b) {
   const uint8_t count = trendSampleCount(state);
   if (count < 2) {
     tft.drawRect(x, y, w, h, ST77XX_WHITE);
@@ -75,8 +73,6 @@ void drawTrendGraph(Adafruit_ST7789& tft,
     tft.drawLine(x0, mapValueToY(b[prevIndex]), x1, mapValueToY(b[currentIndex]), ST77XX_YELLOW);
   }
 }
-
-}  // namespace
 
 void initDisplay(Adafruit_ST7789& tft) {
   tft.init(240, 320);
