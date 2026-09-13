@@ -1,4 +1,10 @@
 #include "hardware_i2c.h"
+
+namespace {
+bool positiveAdcReady = false;
+bool negativeAdcReady = false;
+}
+
 void setupI2cHardware(TwoWire& bus, int sdaPin, int sclPin) {
   bus.setSDA(sdaPin);
   bus.setSCL(sclPin);
@@ -38,29 +44,21 @@ void scanI2cDevices(TwoWire& bus) {
 }
 
 void setupAdcModule(Adafruit_ADS1115& positive, Adafruit_ADS1115& negative) {
-  if (!positive.begin(0x48, &Wire1)) {
+  positiveAdcReady = positive.begin(0x48, &Wire1);
+  if (!positiveAdcReady) {
     Serial.println("Positive ADS FAILED");
-    }   
+  } else {
+    positive.setGain(GAIN_TWOTHIRDS);
+    Serial.println("Positive ADC initialized");
+  }
 
-  if (!negative.begin(0x49, &Wire1)) {
+  negativeAdcReady = negative.begin(0x49, &Wire1);
+  if (!negativeAdcReady) {
     Serial.println("Negative ADS FAILED");
-    }
-
-  if (positive.begin(), &Wire1) {
-    Serial.println("Positive ADC has initialize.");
-  }else{
-    Serial.println("Positive ADC failed to initialize.");
+  } else {
+    negative.setGain(GAIN_TWOTHIRDS);
+    Serial.println("Negative ADC initialized");
   }
-
-  if (!negative.begin(), &Wire1) {
-    Serial.println("Negative ADC has initialize.");
-  }else{
-    Serial.println("Negative ADC failed to initialize.");
-  }
-  positive.setGain(GAIN_TWOTHIRDS);
-  negative.setGain(GAIN_TWOTHIRDS);
-
-
 }
 
 void updateAdcReadings(Adafruit_ADS1115& positive,
@@ -70,12 +68,14 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   const uint8_t channelCount = 4;
   long posSum[channelCount] = {0, 0, 0, 0};
   long negSum[channelCount] = {0, 0, 0, 0};
- Serial.println("adc goign into loop!");
+  Serial.println("adc going into loop!");
 
-//for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
+  if (!positiveAdcReady || !negativeAdcReady) {
+    Serial.println("ADC read skipped: check ADS1115 power, wiring, addresses, and I2C pins");
+    return;
+  }
 
-  Serial.println("START");
-  //adc0 = ads.readADC_SingleEnded(0);
+  for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
 
   Serial.println("POS CH0");
   posSum[0] += positive.readADC_SingleEnded(0);
@@ -106,7 +106,7 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   if (SAMPLE_DELAY_MS > 0) {
     delay(SAMPLE_DELAY_MS);
   }
-//}
+}
 
   const float positiveScale = 1.0f / static_cast<float>(NUM_SAMPLES);
   const float negativeScale = 1.0f / static_cast<float>(NUM_SAMPLES);

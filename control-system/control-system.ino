@@ -33,7 +33,7 @@ void setup() {
 
   initDisplay(tft);
   setupModeSelectPins();
-  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN); 
+  setupI2cHardware(Wire1, I2C1_SDA, I2C1_SCL); 
   scanI2cDevices(Wire1);
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);
@@ -52,30 +52,21 @@ void loop() {
   delay(1000);
   digitalWrite(LED_GPIO, LOW);
   delay(1000);
-  Serial.println("in the loop");
   static unsigned long lastDisplayUpdateMs = 0;
   updateTransportMode(systemState);
-  Serial.println("in the loop_1");
   updateDisplayMode(systemState);
-  Serial.println("in the loop_2, yay!");
   handleSerialCommands(Serial, systemState, CommandSource::Usb); 
-  Serial.println("in the loop_3, yay! again , serial works");
-  //if (systemState.transport_mode == TransportMode::Ethernet) {
-  //  pollNetworkTransport(systemState);
-  //
-  //}
+  if (systemState.transport_mode == TransportMode::Ethernet) {
+   pollNetworkTransport(systemState);
+  
+  }
   updateDacOutputs(gp8413, systemState);
-  Serial.println("in the loop_3.1, dac updates");
   renderDisplay(tft, systemState);
-  Serial.println("in the loop_3.1, tft updates");
 
   updateAdcReadings(adsPositive, adsNegative, systemState);
-  Serial.println("in the loop_3.1, adc updates");
-    //if (millis() - lastDisplayUpdateMs > 250) {
-   //if (millis() - lastDisplayUpdateMs > 250) {
-  //  lastDisplayUpdateMs = millis();
-  //}
-  
+  if (millis() - lastDisplayUpdateMs > 250) {
+   lastDisplayUpdateMs = millis();
+  }  
   
   flush_to_serial(systemState);
   Serial.println("in the loop_4, yay! again , ethernet works! works");
