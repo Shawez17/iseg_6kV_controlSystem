@@ -56,21 +56,34 @@ void loop() {
   updateTransportMode(systemState);
   updateDisplayMode(systemState);
   handleSerialCommands(Serial, systemState, CommandSource::Usb); 
+<<<<<<< HEAD
   if (systemState.transport_mode == TransportMode::Ethernet) {
    pollNetworkTransport(systemState);
   
   }
+=======
+  //if (systemState.transport_mode == TransportMode::Ethernet) {
+  //  pollNetworkTransport(systemState);
+  //
+  //}
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
   updateDacOutputs(gp8413, systemState);
   renderDisplay(tft, systemState);
 
   updateAdcReadings(adsPositive, adsNegative, systemState);
+<<<<<<< HEAD
   if (millis() - lastDisplayUpdateMs > 250) {
    lastDisplayUpdateMs = millis();
   }  
+=======
+    //if (millis() - lastDisplayUpdateMs > 250) {
+   //if (millis() - lastDisplayUpdateMs > 250) {
+  //  lastDisplayUpdateMs = millis();
+  //}
+  
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
   
   flush_to_serial(systemState);
-  Serial.println("in the loop_4, yay! again , ethernet works! works");
   digitalWrite(LED_GPIO, HIGH);
-  Serial.println("in the loop_5, yay! again , all works");
   delay(50);
 }

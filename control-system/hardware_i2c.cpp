@@ -1,10 +1,14 @@
+#include "hardware/watchdog.h" 
 #include "hardware_i2c.h"
 
+<<<<<<< HEAD
 namespace {
 bool positiveAdcReady = false;
 bool negativeAdcReady = false;
 }
 
+=======
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 void setupI2cHardware(TwoWire& bus, int sdaPin, int sclPin) {
   bus.setSDA(sdaPin);
   bus.setSCL(sclPin);
@@ -44,6 +48,7 @@ void scanI2cDevices(TwoWire& bus) {
 }
 
 void setupAdcModule(Adafruit_ADS1115& positive, Adafruit_ADS1115& negative) {
+<<<<<<< HEAD
   positiveAdcReady = positive.begin(0x48, &Wire1);
   if (!positiveAdcReady) {
     Serial.println("Positive ADS FAILED");
@@ -59,15 +64,33 @@ void setupAdcModule(Adafruit_ADS1115& positive, Adafruit_ADS1115& negative) {
     negative.setGain(GAIN_TWOTHIRDS);
     Serial.println("Negative ADC initialized");
   }
+=======
+  if (!positive.begin(0x4A, &Wire1)) {
+    Serial.println("Positive ADS FAILED");
+    }else{
+    Serial.println("[positive](+) ADS WORKING");
+    }   
+
+  if (!negative.begin(0x48, &Wire1)) {
+    Serial.println("Negative ADS FAILED");
+    }else{
+    Serial.println("[negative](-) ADS WORKING");
+    }   
+
+  positive.setGain(GAIN_TWOTHIRDS);
+  negative.setGain(GAIN_TWOTHIRDS);
+
+
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 }
 
 void updateAdcReadings(Adafruit_ADS1115& positive,
                        Adafruit_ADS1115& negative,
                        SystemState& state) {
-  Serial.println("adc started!");
   const uint8_t channelCount = 4;
   long posSum[channelCount] = {0, 0, 0, 0};
   long negSum[channelCount] = {0, 0, 0, 0};
+<<<<<<< HEAD
   Serial.println("adc going into loop!");
 
   if (!positiveAdcReady || !negativeAdcReady) {
@@ -76,37 +99,48 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   }
 
   for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
+=======
 
-  Serial.println("POS CH0");
-  posSum[0] += positive.readADC_SingleEnded(0);
+  for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
 
-  Serial.println("POS CH1");
-  posSum[1] += positive.readADC_SingleEnded(1);
+//    watchdog_update();
+//    posSum[0] += positive.readADC_SingleEnded(0);
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
-  Serial.println("POS CH2");
-  posSum[2] += positive.readADC_SingleEnded(2);
+    watchdog_update();
+    posSum[1] += positive.readADC_SingleEnded(1);
 
-  Serial.println("POS CH3");
-  posSum[3] += positive.readADC_SingleEnded(3);
+    watchdog_update();
+    posSum[2] += positive.readADC_SingleEnded(2);
 
-  Serial.println("NEG CH0");
-  negSum[0] += negative.readADC_SingleEnded(0);
+    watchdog_update();
+    posSum[3] += positive.readADC_SingleEnded(3);
 
-  Serial.println("NEG CH1");
-  negSum[1] += negative.readADC_SingleEnded(1);
+//    watchdog_update();
+//    negSum[0] += negative.readADC_SingleEnded(0);
 
-  Serial.println("NEG CH2");
-  negSum[2] += negative.readADC_SingleEnded(2);
+    watchdog_update();
+    negSum[1] += negative.readADC_SingleEnded(1);
 
-  Serial.println("NEG CH3");
-  negSum[3] += negative.readADC_SingleEnded(3);
+    watchdog_update();
+    negSum[2] += negative.readADC_SingleEnded(2);
 
-  Serial.println("ALL ADC READS DONE");
+    watchdog_update();
+    negSum[3] += negative.readADC_SingleEnded(3);
 
+    if (SAMPLE_DELAY_MS > 0) {
+      delay(SAMPLE_DELAY_MS);
+    }
+
+}
+
+<<<<<<< HEAD
   if (SAMPLE_DELAY_MS > 0) {
     delay(SAMPLE_DELAY_MS);
   }
 }
+=======
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
   const float positiveScale = 1.0f / static_cast<float>(NUM_SAMPLES);
   const float negativeScale = 1.0f / static_cast<float>(NUM_SAMPLES);
@@ -120,18 +154,17 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   }
 
 
-  Serial.println("adc computing voltage!");
-  state.vref_pos = positive.computeVolts(posAvg[0]);
-  state.vmon_pos = positive.computeVolts(posAvg[1]);
-  state.imon_pos = positive.computeVolts(posAvg[2]);
-  state.vset_pos = positive.computeVolts(posAvg[3]);
-  state.hv_pos = HV_FACTOR_POS * state.vset_pos;
+//  state.vref_pos = positive.computeVolts(posAvg[0]);
+  state.vset_pos = positive.computeVolts(posAvg[1]);
+  state.vmon_pos = positive.computeVolts(posAvg[2]);
+  state.imon_pos = positive.computeVolts(posAvg[3]);
+  state.hv_pos = HV_FACTOR_POS * state.vmon_pos;
 
-  state.vref_neg = negative.computeVolts(negAvg[0]);
-  state.vmon_neg = negative.computeVolts(negAvg[1]);
-  state.imon_neg = negative.computeVolts(negAvg[2]);
-  state.vset_neg = negative.computeVolts(negAvg[3]);
-  state.hv_neg = HV_FACTOR_NEG * state.vset_neg;
+//  state.vref_neg = negative.computeVolts(negAvg[0]);
+  state.vset_neg = negative.computeVolts(negAvg[1]);
+  state.vmon_neg = negative.computeVolts(negAvg[2]);
+  state.imon_neg = negative.computeVolts(negAvg[3]);
+  state.hv_neg = HV_FACTOR_NEG * state.vmon_neg;
 
   state.trend_hv_pos[state.trend_head] = state.hv_pos;
   state.trend_hv_neg[state.trend_head] = state.hv_neg;
@@ -144,23 +177,19 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
 }
 
 void flush_to_serial(const SystemState& state) {
-  Serial.println("========== Serial monitor- ADC READINGS ==========");
 
-  Serial.printf("POS: Vref = %.4f V, Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
-                state.vref_pos,
+  Serial.printf("POS:  Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
                 state.vmon_pos,
                 state.imon_pos,
                 state.vset_pos,
                 state.hv_pos);
 
-  Serial.printf("NEG: Vref = %.4f V, Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
-                state.vref_neg,
+  Serial.printf("NEG:  Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
                 state.vmon_neg,
                 state.imon_neg,
                 state.vset_neg,
                 state.hv_neg);
 
-  Serial.println("==================================");
 }
 
 void setupDacModule(DFRobot_GP8XXX_IIC& dac, SystemState& state) {
@@ -175,19 +204,17 @@ void setupDacModule(DFRobot_GP8XXX_IIC& dac, SystemState& state) {
   
 
   dac.setDACOutRange(dac.eOutputRange5V);
-  state.dac_code_0 = 32767; // Set DAC channel 0 to mid-scale (0V)
-  state.dac_code_1 = 16383; // Set DAC channel 1 to quarter-scale
+  state.dac_code_0 = 500; // Set DAC channel 0 to mid-scale (0V)
+  state.dac_code_1 =  500; // Set DAC channel 1 to quarter-scale
   dac.setDACOutVoltage(state.dac_code_0, 0);
-  Serial.println("dac channel 0 set to 5V");
+  Serial.println("dac channel 0 set to 0V");
   dac.setDACOutVoltage(state.dac_code_1, 1);
-  Serial.println("dac channel 1 set to 2.5V");
+  Serial.println("dac channel 1 set to 0V");
   delay(SETTLE_DELAY_MS);
 }
 
 void updateDacOutputs(DFRobot_GP8XXX_IIC& dac, const SystemState& state) {
   dac.setDACOutVoltage(state.dac_code_0, 0);
-  Serial.println("dac channel 0 updates..");
   dac.setDACOutVoltage(state.dac_code_1, 1);
-  Serial.println("dac channel 1 updates..");
   delay(SETTLE_DELAY_MS);
 }

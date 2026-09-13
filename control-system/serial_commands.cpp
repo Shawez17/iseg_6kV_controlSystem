@@ -29,6 +29,11 @@ static bool parseChannelAndValue(const String& payload, uint8_t& channel, float&
   return (channel == 1 || channel == 2);
 }
 
+<<<<<<< HEAD
+=======
+
+namespace {
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
 uint16_t clampDacCode(long value) {
   if (value < 0) {

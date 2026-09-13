@@ -19,12 +19,22 @@ constexpr int I2C0_SCL = 5;
 constexpr int I2C1_SDA = 2;
 constexpr int I2C1_SCL = 3;
 
+<<<<<<< HEAD
 // TFT display pins
 constexpr int TFT_SCK = 10;
 constexpr int TFT_TX  = 11;
 constexpr int TFT_RX  = 12;
 constexpr int TFT_CS  = 13;
 constexpr int TFT_DC  = 14;
+=======
+constexpr uint32_t I2C_WATCHDOG_TIMEOUT_MS = 300; // must be > worst-case normal I2C op time
+constexpr int I2C_SDA_PIN = 2;
+constexpr int I2C_SCL_PIN = 3;
+
+constexpr int LED_GPIO = 25;
+constexpr int TFT_CS = 13;
+constexpr int TFT_DC = 14;
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 constexpr int TFT_RST = 15;
 
 // // Other GPIO pin assignments
@@ -38,11 +48,29 @@ constexpr int DISPLAY_SEL_PIN = 1; // Pin for selecting display mode (Trend/Live
 constexpr float HV_FACTOR_POS = 1200.0f;
 constexpr float HV_FACTOR_NEG = 1200.0f;
 constexpr float VSET_MAX_VOLTS = 6000.0f;
+<<<<<<< HEAD
 constexpr uint16_t MAX_DAC_BITS = 16383; // 2^14 - 1 for 15-bit DAC clamped at 5V
 constexpr uint16_t NUM_SAMPLES = 2;
 constexpr uint16_t SAMPLE_DELAY_MS = 0;
 constexpr uint16_t SETTLE_DELAY_MS = 2;
 constexpr uint8_t TREND_SAMPLES = 64;
+=======
+constexpr uint16_t MAX_DAC_BITS = 32767;
+constexpr uint16_t NUM_SAMPLES = 50;
+constexpr uint16_t SAMPLE_DELAY_MS = 0;
+constexpr uint16_t SETTLE_DELAY_MS = 2;
+constexpr uint8_t TREND_SAMPLES = 32;
+
+// WIZnet / Ethernet hardware pins (placeholders). Fill when wiring is known.
+// constexpr int WIZNET_CS_PIN = -1;   // Chip-select for WIZnet SPI (if required)
+// constexpr int WIZNET_RST_PIN = -1;  // Reset pin for WIZnet (if required)
+// constexpr int WIZNET_INT_PIN = -1;  // Interrupt pin from WIZnet (optional)
+//<<<<<<< HEAD
+
+//=======
+// 
+//>>>>>>> 7e5636d (Initialtes 11-09-26_Wire1)
+>>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
 // Network defaults — update these to match your network. If not set,
 // the network transport will remain a no-op unless compiled with
