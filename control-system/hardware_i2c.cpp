@@ -1,14 +1,6 @@
 #include "hardware/watchdog.h" 
 #include "hardware_i2c.h"
 
-<<<<<<< HEAD
-namespace {
-bool positiveAdcReady = false;
-bool negativeAdcReady = false;
-}
-
-=======
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 void setupI2cHardware(TwoWire& bus, int sdaPin, int sclPin) {
   bus.setSDA(sdaPin);
   bus.setSCL(sclPin);
@@ -20,25 +12,25 @@ void scanI2cDevices(TwoWire& bus) {
   byte address;
   int nDevices = 0;
 
-  Serial.println("Scanning Wire1 (I2C1)...");
+  //Serial.println("Scanning Wire1 (I2C1)...");
 
   for (address = 0x01; address < 0x7F; address++) {
     bus.beginTransmission(address);
     error = bus.endTransmission();
 
     if (error == 0) {
-      Serial.printf(
-        "I2C1: device found at address 0x%02X\n",
-        address
-      );
+      //Serial.printf(
+      //  "I2C1: device found at address 0x%02X\n",
+      //  address
+      //);
       nDevices++;
     }
     else if (error != 2) {
-      Serial.printf(
-        "I2C1: error %u at address 0x%02X\n",
-        error,
-        address
-      );
+      //Serial.printf(
+       // "I2C1: error %u at address 0x%02X\n",
+       // error,
+       // address
+      //);
     }
   }
 
@@ -48,40 +40,22 @@ void scanI2cDevices(TwoWire& bus) {
 }
 
 void setupAdcModule(Adafruit_ADS1115& positive, Adafruit_ADS1115& negative) {
-<<<<<<< HEAD
-  positiveAdcReady = positive.begin(0x48, &Wire1);
-  if (!positiveAdcReady) {
-    Serial.println("Positive ADS FAILED");
-  } else {
-    positive.setGain(GAIN_TWOTHIRDS);
-    Serial.println("Positive ADC initialized");
-  }
-
-  negativeAdcReady = negative.begin(0x49, &Wire1);
-  if (!negativeAdcReady) {
-    Serial.println("Negative ADS FAILED");
-  } else {
-    negative.setGain(GAIN_TWOTHIRDS);
-    Serial.println("Negative ADC initialized");
-  }
-=======
   if (!positive.begin(0x4A, &Wire1)) {
-    Serial.println("Positive ADS FAILED");
+    //Serial.println("Positive ADS FAILED");
     }else{
-    Serial.println("[positive](+) ADS WORKING");
+    //Serial.println("[positive](+) ADS WORKING");
     }   
 
   if (!negative.begin(0x48, &Wire1)) {
-    Serial.println("Negative ADS FAILED");
+    //Serial.println("Negative ADS FAILED");
     }else{
-    Serial.println("[negative](-) ADS WORKING");
+    //Serial.println("[negative](-) ADS WORKING");
     }   
 
   positive.setGain(GAIN_TWOTHIRDS);
   negative.setGain(GAIN_TWOTHIRDS);
 
 
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 }
 
 void updateAdcReadings(Adafruit_ADS1115& positive,
@@ -90,22 +64,11 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   const uint8_t channelCount = 4;
   long posSum[channelCount] = {0, 0, 0, 0};
   long negSum[channelCount] = {0, 0, 0, 0};
-<<<<<<< HEAD
-  Serial.println("adc going into loop!");
-
-  if (!positiveAdcReady || !negativeAdcReady) {
-    Serial.println("ADC read skipped: check ADS1115 power, wiring, addresses, and I2C pins");
-    return;
-  }
-
-  for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
-=======
 
   for (uint16_t sample = 0; sample < NUM_SAMPLES; ++sample) {
 
 //    watchdog_update();
 //    posSum[0] += positive.readADC_SingleEnded(0);
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
     watchdog_update();
     posSum[1] += positive.readADC_SingleEnded(1);
@@ -134,13 +97,6 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
 
 }
 
-<<<<<<< HEAD
-  if (SAMPLE_DELAY_MS > 0) {
-    delay(SAMPLE_DELAY_MS);
-  }
-}
-=======
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
 
   const float positiveScale = 1.0f / static_cast<float>(NUM_SAMPLES);
   const float negativeScale = 1.0f / static_cast<float>(NUM_SAMPLES);
@@ -189,27 +145,26 @@ void flush_to_serial(const SystemState& state) {
                 state.imon_neg,
                 state.vset_neg,
                 state.hv_neg);
-
 }
 
 void setupDacModule(DFRobot_GP8XXX_IIC& dac, SystemState& state) {
   //state.dac_code_0 = 32767; // Set DAC channel 0 to mid-scale (0V)
 
     if ((dac.begin()), &Wire1) {
-        Serial.println("GP8413 has initialised");
+        //Serial.println("GP8413 has initialised");
     }
     else{
-        Serial.println("GP8413 has NOT initialized.");
+        //Serial.println("GP8413 has NOT initialized.");
     }
   
 
   dac.setDACOutRange(dac.eOutputRange5V);
-  state.dac_code_0 = 500; // Set DAC channel 0 to mid-scale (0V)
-  state.dac_code_1 =  500; // Set DAC channel 1 to quarter-scale
+  state.dac_code_0 = 655; // Set DAC channel 0 to mid-scale (0V)
+  state.dac_code_1 =  655; // Set DAC channel 1 to quarter-scale
   dac.setDACOutVoltage(state.dac_code_0, 0);
-  Serial.println("dac channel 0 set to 0V");
+  //Serial.println("dac channel 0 set to 0V");
   dac.setDACOutVoltage(state.dac_code_1, 1);
-  Serial.println("dac channel 1 set to 0V");
+  //Serial.println("dac channel 1 set to 0V");
   delay(SETTLE_DELAY_MS);
 }
 

@@ -24,16 +24,16 @@ void setup() {
     delay(10);
   }
 
-  Serial.println("Starting HV control system...");
+//  Serial.println("Starting HV control system...");
 
-  SPI1.setSCK(TFT_SCK);
-  SPI1.setTX(TFT_TX);
-  SPI1.setRX(TFT_RX);
+  SPI1.setSCK(10);
+  SPI1.setTX(11);
+  SPI1.setRX(12);
   SPI1.setCS(TFT_CS);
 
   initDisplay(tft);
   setupModeSelectPins();
-  setupI2cHardware(Wire1, I2C1_SDA, I2C1_SCL); 
+  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN); 
   scanI2cDevices(Wire1);
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);
@@ -43,7 +43,7 @@ void setup() {
   systemState.transport_mode = TransportMode::Usb;
   systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
-  Serial.println("Setup is done\nSystem ready.");
+ // Serial.println("Setup is done\nSystem ready.");
 }
 
 void loop() {
@@ -56,32 +56,19 @@ void loop() {
   updateTransportMode(systemState);
   updateDisplayMode(systemState);
   handleSerialCommands(Serial, systemState, CommandSource::Usb); 
-<<<<<<< HEAD
-  if (systemState.transport_mode == TransportMode::Ethernet) {
-   pollNetworkTransport(systemState);
-  
-  }
-=======
   //if (systemState.transport_mode == TransportMode::Ethernet) {
   //  pollNetworkTransport(systemState);
   //
   //}
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
   updateDacOutputs(gp8413, systemState);
   renderDisplay(tft, systemState);
 
   updateAdcReadings(adsPositive, adsNegative, systemState);
-<<<<<<< HEAD
-  if (millis() - lastDisplayUpdateMs > 250) {
-   lastDisplayUpdateMs = millis();
-  }  
-=======
     //if (millis() - lastDisplayUpdateMs > 250) {
    //if (millis() - lastDisplayUpdateMs > 250) {
   //  lastDisplayUpdateMs = millis();
   //}
   
->>>>>>> 7e19ef0 (Initialtes 13-09-26_workingCode)
   
   flush_to_serial(systemState);
   digitalWrite(LED_GPIO, HIGH);
