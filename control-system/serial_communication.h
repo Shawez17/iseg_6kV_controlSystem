@@ -14,6 +14,5 @@ bool isSerialHostConnected();
 bool isDebugOutputEnabled(const SystemState& state);
 void setupModeSelectPins();
 void updateTransportMode(SystemState& state);
-void updateDisplayMode(SystemState& state);
 void handleSerialCommands(Stream& serial, SystemState& state, CommandSource source);
 void flushToSerial(const SystemState& state);

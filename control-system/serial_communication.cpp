@@ -136,23 +136,6 @@ bool isDebugDacCommand(const String& command) {
   return command == "DAC?" || command.startsWith("DAC0=") || command.startsWith("DAC1=") || command.startsWith("DAC=") || command.startsWith("SOUR:DAC");
 }
 
-bool ethernetCableConnected() {
-  return Ethernet.linkStatus() == LinkON;
-}
-
-void handleEthernetTransportFailure(SystemState& state) {
-  if (state.transport_mode != TransportMode::Ethernet) {
-    return;
-  }
-
-  raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-             "Ethernet cable disconnected; falling back to USB");
-
-  if (isSerialHostConnected()) {
-    state.transport_mode = TransportMode::Usb;
-  }
-}
-
 }  // namespace
 
 void initializeSerialPort() {
@@ -172,11 +155,10 @@ void setupModeSelectPins() {
   if (isSelectablePin(TRANSPORT_SEL_PIN)) {
     pinMode(TRANSPORT_SEL_PIN,
             TRANSPORT_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT);
-  }
 
-  if (isSelectablePin(DISPLAY_SEL_PIN)) {
-    pinMode(DISPLAY_SEL_PIN,
-            DISPLAY_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT);
+    if (TRANSPORT_SEL_USE_PULLUP) {
+      digitalWrite(TRANSPORT_SEL_PIN, HIGH);
+    }
   }
 }
 
@@ -189,25 +171,9 @@ void updateTransportMode(SystemState& state) {
 
   const bool ethernetSelected = (digitalRead(TRANSPORT_SEL_PIN) == HIGH);
 
-  if (ethernetSelected && !ethernetCableConnected()) {
-    state.transport_mode = TransportMode::Usb;
-    state.display_mode = DisplayMode::Live;
-    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Ethernet cable disconnected; using USB and live display");
-    return;
-  }
-
   state.transport_mode = ethernetSelected ? TransportMode::Ethernet : TransportMode::Usb;
   if (state.transport_mode == TransportMode::Usb) {
     state.display_mode = DisplayMode::Live;
-  }
-}
-
-void updateDisplayMode(SystemState& state) {
-  if (isSelectablePin(DISPLAY_SEL_PIN)) {
-    state.display_mode = (digitalRead(DISPLAY_SEL_PIN) == HIGH)
-                             ? DisplayMode::Trend
-                             : DisplayMode::Live;
   }
 }
 

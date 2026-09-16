@@ -2,6 +2,7 @@
 
 #include "display_images.h"
 #include "error_handling.h"
+#include "ethernet_communication.h"
 #include "tifrh_logo.h"
 
 namespace {
@@ -210,6 +211,29 @@ void renderLiveView(Adafruit_ST7789& tft, const SystemState& state, LiveDisplayC
   static const char* debugOn = "ON";
   static const char* debugOff = "OFF";
 
+  static bool ethernetIpBannerActive = false;
+  static uint32_t ethernetIpBannerUntilMs = 0;
+  static IPAddress ethernetIpBannerValue(0, 0, 0, 0);
+
+  if (ethernetInterfaceReady() && !ethernetIpBannerActive) {
+    ethernetIpBannerActive = true;
+    ethernetIpBannerUntilMs = millis() + 3000;
+    ethernetIpBannerValue = ethernetLocalIP();
+  }
+
+  if (ethernetIpBannerActive) {
+    tft.fillRect(0, 0, screenWidth, 26, ST77XX_BLACK);
+    tft.setTextColor(ST77XX_GREEN);
+    tft.setTextSize(1);
+    tft.setCursor(8, 4);
+    tft.print("IP:");
+    tft.print(ethernetIpBannerValue);
+
+    if (millis() >= ethernetIpBannerUntilMs) {
+      ethernetIpBannerActive = false;
+    }
+  }
+
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(textSize);
 
@@ -299,8 +323,8 @@ void initDisplay(Adafruit_ST7789& tft) {
   tft.setCursor(45, 108);
   tft.setTextColor(ST77XX_BLACK);
   tft.setTextSize(3);
-  tft.println("INITIALIZING...");
-  delay(3000);
+  // tft.println("INITIALIZING...");
+  // delay(3000);
 }
 
 void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {

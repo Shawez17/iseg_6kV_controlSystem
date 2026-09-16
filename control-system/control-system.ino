@@ -20,6 +20,8 @@ void setup() {
   digitalWrite(LED_GPIO, LOW);
 
   initializeSerialPort();
+  delay(100);
+  // Serial.println("Serial ready");
 
   SPI1.setSCK(10);
   SPI1.setTX(11);
@@ -35,18 +37,17 @@ void setup() {
   systemState.transport_mode = TransportMode::Usb;
   systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
-  digitalWrite(0, HIGH);
 }
 
 void loop() {
   updateTransportMode(systemState);
-  updateDisplayMode(systemState);
   updateErrorState();
 
   if (hasActiveError()) {
     if (systemState.transport_mode == TransportMode::Ethernet) {
       pollEthernetCommunication(systemState);
-    } else {
+    } 
+    else {
       handleSerialCommands(Serial, systemState, CommandSource::Usb);
     }
 
@@ -58,7 +59,8 @@ void loop() {
 
   if (systemState.transport_mode == TransportMode::Ethernet) {
     pollEthernetCommunication(systemState);
-  } else {
+  } 
+  else {
     handleSerialCommands(Serial, systemState, CommandSource::Usb);
   }
 

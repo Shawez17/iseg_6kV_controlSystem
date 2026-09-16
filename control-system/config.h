@@ -38,8 +38,6 @@ constexpr int I2C_SCL_PIN = 3;
 
 constexpr int TRANSPORT_SEL_PIN = 1;
 constexpr bool TRANSPORT_SEL_USE_PULLUP = false;
-constexpr int DISPLAY_SEL_PIN = -1;
-constexpr bool DISPLAY_SEL_USE_PULLUP = false;
 
 constexpr uint8_t ADDR_GP8413 = 0x58;
 constexpr uint8_t ADDR_ADS1115_CH1 = 0x4A;
@@ -65,6 +63,7 @@ constexpr uint16_t SETTLE_DELAY_MS = 2;
 constexpr uint8_t TREND_SAMPLES = 64;
 
 constexpr uint8_t ETHERNET_MAC_ADDRESS[6] = {0x02, 0x60, 0x51, 0x10, 0x50, 0x01};
+constexpr bool ETHERNET_USE_DHCP = true;
 constexpr uint8_t DEFAULT_IP[4] = {10, 10, 7, 254};
 constexpr uint8_t DEFAULT_SUBNET[4] = {255, 255, 255, 0};
 constexpr uint8_t DEFAULT_GATEWAY[4] = {10, 10, 7, 1};

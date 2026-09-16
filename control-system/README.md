@@ -35,6 +35,7 @@ The firmware accepts ASCII commands over the USB serial port and also supports t
 | `STOP` / `DEBUG OFF` | Disables debug mode. | Suppresses extra serial output. |
 | `ERROR:CLEAR` | Clears the current active error state. | Used to reset error screens and faults. |
 | `CONF:TRAN?` | Reports the active transport mode. | Returns `TRANSPORT=USB` or `TRANSPORT=ETHERNET`. |
+| `CONF:SEL?` | Reports the transport selector pin state. | Returns `TRANSPORT_SEL_PIN=HIGH` or `TRANSPORT_SEL_PIN=LOW`. |
 | `SOUR:VOLT<ch>,<volts>` | Sets the target set-point voltage for a channel. | Format: `SOUR:VOLT1,1200` or `SOUR:VOLT2,1500`. |
 | `MEAS:VOLT?` / `MEAS:VOLT` | Prints the current measured and set-point voltages. | Includes +VSET, +HV, -VSET, and -HV values. |
 | `MEAS:VOLT1` / `MEAS:VOLT1?` | Prints positive-channel voltage snapshot. | Returns +VSET and +HV. |
@@ -75,6 +76,7 @@ The raw DAC commands are intentionally debug-only for safety. They are accepted 
 - `MEAS:CURR?` (or `MEAS:CURR`) prints both current monitor values
 - `MEAS:CURR1` and `MEAS:CURR2` print per-channel current monitor values
 - `CONF:TRAN?` reports whether the board is in `USB` or `ETHERNET` mode
+- `CONF:SEL?` reports the raw `TRANSPORT_SEL_PIN` state as `HIGH` or `LOW`
 - `ERROR:CLEAR` resets the fault state so the system can resume after a command or transport error
 
 ### Example session

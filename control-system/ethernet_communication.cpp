@@ -8,7 +8,6 @@
 
 namespace {
 
-constexpr uint8_t kEthernetMac[6] = {0x02, 0x1A, 0x6B, 0x51, 0x00, 0x01};
 #ifdef WIZNET_CS_PIN
 constexpr int kWiznetCsPin = WIZNET_CS_PIN;
 #else
@@ -19,23 +18,10 @@ EthernetServer server(TCP_PORT);
 EthernetClient client;
 bool ethernetStarted = false;
 
-void startEthernet() {
-  if (ethernetStarted) {
-    return;
+void printEthernetStatus(const String& message) {
+  if (isSerialHostConnected()) {
+    Serial.println(message);
   }
-
-  if (Ethernet.linkStatus() != LinkON) {
-    return;
-  }
-
-  Ethernet.init(kWiznetCsPin);
-  Ethernet.begin(const_cast<uint8_t*>(kEthernetMac),
-                 const_cast<uint8_t*>(DEFAULT_IP),
-                 const_cast<uint8_t*>(DEFAULT_GATEWAY),
-                 const_cast<uint8_t*>(DEFAULT_GATEWAY),
-                 const_cast<uint8_t*>(DEFAULT_SUBNET));
-  server.begin();
-  ethernetStarted = true;
 }
 
 void stopClient() {
@@ -45,20 +31,84 @@ void stopClient() {
   client = EthernetClient();
 }
 
-}  // namespace
+void configureEthernetStatic() {
+  const IPAddress staticIp(DEFAULT_IP[0], DEFAULT_IP[1], DEFAULT_IP[2], DEFAULT_IP[3]);
+  const IPAddress subnet(DEFAULT_SUBNET[0], DEFAULT_SUBNET[1], DEFAULT_SUBNET[2], DEFAULT_SUBNET[3]);
+  const IPAddress gateway(DEFAULT_GATEWAY[0], DEFAULT_GATEWAY[1], DEFAULT_GATEWAY[2], DEFAULT_GATEWAY[3]);
+  const IPAddress dns(DEFAULT_GATEWAY[0], DEFAULT_GATEWAY[1], DEFAULT_GATEWAY[2], DEFAULT_GATEWAY[3]);
 
-void initializeEthernetCommunication() {
-  if (Ethernet.linkStatus() != LinkON) {
+  Ethernet.begin(const_cast<uint8_t*>(ETHERNET_MAC_ADDRESS), staticIp, dns, gateway, subnet);
+
+  if (Ethernet.localIP() == IPAddress(0, 0, 0, 0)) {
     raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Ethernet cable disconnected; USB remains active");
+               "Static Ethernet configuration failed");
     return;
   }
 
+  printEthernetStatus("Static Ethernet configured");
+}
+
+void startEthernet() {
+  if (ethernetStarted) {
+    return;
+  }
+
+  Ethernet.init(kWiznetCsPin);
+
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
+               "Ethernet hardware not detected");
+    return;
+  }
+
+  printEthernetStatus("Initializing Ethernet via DHCP...");
+  printEthernetStatus("Using MAC: " + String(ETHERNET_MAC_ADDRESS[0], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[1], HEX) + ":" +
+                      String(ETHERNET_MAC_ADDRESS[2], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[3], HEX) + ":" +
+                      String(ETHERNET_MAC_ADDRESS[4], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[5], HEX));
+
+  if (ETHERNET_USE_DHCP) {
+    Ethernet.begin(const_cast<uint8_t*>(ETHERNET_MAC_ADDRESS));
+  } else {
+    configureEthernetStatic();
+  }
+
+  if (Ethernet.localIP() == IPAddress(0, 0, 0, 0)) {
+    stopClient();
+    ethernetStarted = false;
+    printEthernetStatus("DHCP not ready yet; waiting for cable / DHCP server");
+    return;
+  }
+
+  server.begin();
+  ethernetStarted = true;
+
+  if (isSerialHostConnected()) {
+    Serial.print("Ethernet DHCP ready: ");
+    Serial.println(Ethernet.localIP());
+  }
+}
+
+}  // namespace
+
+void initializeEthernetCommunication() {
   startEthernet();
+
+  if (!ethernetStarted) {
+    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
+               "Ethernet cable disconnected or DHCP failed; USB remains active");
+  }
 }
 
 bool ethernetClientConnected() {
   return client && client.connected();
+}
+
+bool ethernetInterfaceReady() {
+  return ethernetStarted && (Ethernet.localIP() != IPAddress(0, 0, 0, 0));
+}
+
+IPAddress ethernetLocalIP() {
+  return Ethernet.localIP();
 }
 
 void pollEthernetCommunication(SystemState& state) {
