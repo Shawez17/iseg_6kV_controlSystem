@@ -1,6 +1,29 @@
 #include "display_ui.h"
 
+#include "error_handling.h"
+
 namespace {
+
+constexpr int16_t kTextLineHeight = lineHeight;
+constexpr int16_t kLiveValueX = valueX;
+constexpr int16_t kLiveValueWidth = valueWidth;
+constexpr uint16_t kDarkNavy = 0x0010;
+
+constexpr int16_t kTrendGraphWidth = trendGraphWidth;
+constexpr int16_t kTrendGraphHeight = trendGraphHeight;
+
+struct LiveDisplayCache {
+  bool initialized = false;
+  float vset_pos = 0.0f;
+  float vmon_pos = 0.0f;
+  float hv_pos = 0.0f;
+  float vset_neg = 0.0f;
+  float vmon_neg = 0.0f;
+  float hv_neg = 0.0f;
+  bool debug_mode = false;
+  TransportMode transport_mode = TransportMode::Usb;
+  DisplayMode display_mode = DisplayMode::Live;
+};
 
 const char* transportModeText(TransportMode mode) {
   return (mode == TransportMode::Ethernet) ? "ETH" : "USB";
@@ -11,7 +34,7 @@ const char* displayModeText(DisplayMode mode) {
 }
 
 uint8_t trendSampleCount(const SystemState& state) {
-  return state.trend_full ? TREND_SAMPLES : state.trend_head;
+  return state.trend_full ? trendSamples : state.trend_head;
 }
 
 uint8_t trendIndexFromOldest(const SystemState& state, uint8_t offset) {
@@ -20,7 +43,69 @@ uint8_t trendIndexFromOldest(const SystemState& state, uint8_t offset) {
     return 0;
   }
 
-  return static_cast<uint8_t>((state.trend_full ? state.trend_head : 0) + offset) % TREND_SAMPLES;
+  return static_cast<uint8_t>((state.trend_full ? state.trend_head : 0) + offset) % trendSamples;
+}
+
+bool nearlyEqual(float lhs, float rhs, float epsilon = valueEpsilon) {
+  return fabs(lhs - rhs) <= epsilon;
+}
+
+void drawWarningSymbol(Adafruit_ST7789& tft, int16_t cx, int16_t cy) {
+  tft.fillTriangle(cx, cy - 34, cx - 34, cy + 28, cx + 34, cy + 28, ST77XX_YELLOW);
+  tft.fillTriangle(cx, cy - 24, cx - 22, cy + 18, cx + 22, cy + 18, ST77XX_BLACK);
+  tft.fillRect(cx - 4, cy - 8, 8, 22, ST77XX_YELLOW);
+  tft.fillRect(cx - 4, cy + 18, 8, 8, ST77XX_YELLOW);
+}
+
+void drawTifrBrandMark(Adafruit_ST7789& tft, int16_t cx, int16_t cy) {
+  tft.fillRoundRect(cx - 62, cy - 34, 124, 68, 12, ST77XX_BLUE);
+  tft.drawRoundRect(cx - 62, cy - 34, 124, 68, 12, ST77XX_CYAN);
+
+  tft.fillTriangle(cx - 36, cy + 22, cx + 36, cy + 22, cx, cy - 20, ST77XX_RED);
+  tft.fillRect(cx - 6, cy - 18, 12, 42, ST77XX_WHITE);
+  tft.fillRect(cx - 28, cy - 18, 56, 8, ST77XX_WHITE);
+}
+
+void showWelcomeLogo(Adafruit_ST7789& tft) {
+  tft.fillScreen(ST77XX_BLACK);
+
+  tft.fillRect(0, 0, screenWidth, 32, kDarkNavy);
+  tft.setTextColor(ST77XX_CYAN);
+  tft.setTextSize(2);
+  tft.setCursor(96, 8);
+  tft.println("TIFR");
+
+  drawTifrBrandMark(tft, screenWidth / 2, 92);
+
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(3);
+  tft.setCursor(38, 150);
+  tft.println("HIGH VOLTAGE");
+  tft.setTextSize(2);
+  tft.setCursor(72, 190);
+  tft.println("CONTROL SYSTEM");
+}
+
+void showWarningScreen(Adafruit_ST7789& tft) {
+  tft.fillScreen(ST77XX_BLACK);
+  tft.fillRoundRect(24, 28, screenWidth - 48, 184, 18, kDarkNavy);
+  tft.drawRoundRect(24, 28, screenWidth - 48, 184, 18, ST77XX_RED);
+
+  drawWarningSymbol(tft, 76, 92);
+
+  tft.setTextColor(ST77XX_RED);
+  tft.setTextSize(3);
+  tft.setCursor(110, 42);
+  tft.println("WARNING");
+
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(2);
+  tft.setCursor(92, 114);
+  tft.println("HIGH VOLTAGE");
+  tft.setCursor(95, 142);
+  tft.println("DO NOT TOUCH");
+  tft.setCursor(62, 170);
+  tft.println("AUTHORIZED PERSONNEL ONLY");
 }
 
 void drawTrendGraph(Adafruit_ST7789& tft,
@@ -33,8 +118,9 @@ void drawTrendGraph(Adafruit_ST7789& tft,
                     const float* b) {
   const uint8_t count = trendSampleCount(state);
   if (count < 2) {
+    tft.fillRect(x, y, w, h, ST77XX_BLACK);
     tft.drawRect(x, y, w, h, ST77XX_WHITE);
-    tft.setCursor(x + 4, y + 4);
+    tft.setCursor(x + trendPlotOffset, y + trendPlotOffset);
     tft.println("Waiting for samples");
     return;
   }
@@ -53,12 +139,13 @@ void drawTrendGraph(Adafruit_ST7789& tft,
     minValue -= 1.0f;
   }
 
+  tft.fillRect(x, y, w, h, ST77XX_BLACK);
   tft.drawRect(x, y, w, h, ST77XX_WHITE);
 
-  const int16_t plotWidth = w - 6;
-  const int16_t plotHeight = h - 18;
-  const int16_t plotX = x + 3;
-  const int16_t plotY = y + 12;
+  const int16_t plotWidth = w - trendPlotPadding;
+  const int16_t plotHeight = h - lineHeight;
+  const int16_t plotX = x + trendPlotOffset;
+  const int16_t plotY = y + trendLabelOffset;
 
   auto mapValueToY = [&](float value) {
     const float normalized = (value - minValue) / (maxValue - minValue);
@@ -76,54 +163,137 @@ void drawTrendGraph(Adafruit_ST7789& tft,
   }
 }
 
-}  // namespace
-
-void initDisplay(Adafruit_ST7789& tft) {
-  tft.init(240, 320);
-  tft.setRotation(-1);
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setCursor(30, 100);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(2);
-  tft.println("There is only one god given ground");
-}
-
-
-void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
-  if (state.display_mode == DisplayMode::Trend) {
-    tft.fillScreen(ST77XX_BLACK);
-    tft.setCursor(0, 0);
-    tft.setTextColor(ST77XX_WHITE);
-    tft.setTextSize(2);
-    tft.println("Trend View");
-    drawTrendGraph(tft, 0, 24, 320, 100, state, state.trend_hv_pos, state.trend_hv_neg);
-    drawTrendGraph(tft, 0, 130, 320, 100, state, state.trend_imon_pos, state.trend_imon_neg);
+void drawLiveValueLine(Adafruit_ST7789& tft,
+                      int16_t y,
+                      const char* label,
+                      float value,
+                      uint8_t precision,
+                      float& lastValue,
+                      bool initialized) {
+  if (initialized && nearlyEqual(lastValue, value)) {
     return;
   }
 
+  tft.fillRect(kLiveValueX, y, kLiveValueWidth, kTextLineHeight, ST77XX_BLACK);
+  tft.setCursor(kLiveValueX, y);
+  tft.print(label);
+  tft.print(value, precision);
+  lastValue = value;
+}
+
+void renderLiveView(Adafruit_ST7789& tft, const SystemState& state, LiveDisplayCache& cache) {
+  static const char* debugOn = "ON";
+  static const char* debugOff = "OFF";
+
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(textSize);
+
+  drawLiveValueLine(tft, liveTopY + 0 * lineHeight, "+Vset: ", state.vset_pos, voltagePrecision, cache.vset_pos, cache.initialized);
+  drawLiveValueLine(tft, liveTopY + 1 * lineHeight, "+Vmon: ", state.vmon_pos, voltagePrecision, cache.vmon_pos, cache.initialized);
+  drawLiveValueLine(tft, liveTopY + 2 * lineHeight, "+HV: ", state.hv_pos, hvPrecision, cache.hv_pos, cache.initialized);
+  drawLiveValueLine(tft, liveTopY + 3 * lineHeight, "-Vset: ", state.vset_neg, voltagePrecision, cache.vset_neg, cache.initialized);
+  drawLiveValueLine(tft, liveTopY + 4 * lineHeight, "-Vmon: ", state.vmon_neg, voltagePrecision, cache.vmon_neg, cache.initialized);
+  drawLiveValueLine(tft, liveTopY + 5 * lineHeight, "-HV: ", state.hv_neg, hvPrecision, cache.hv_neg, cache.initialized);
+
+  const char* debugText = state.debug_mode ? debugOn : debugOff;
+  if (!cache.initialized || cache.debug_mode != state.debug_mode) {
+    tft.fillRect(kLiveValueX, debugRowY, kLiveValueWidth, kTextLineHeight, ST77XX_BLACK);
+    tft.setCursor(kLiveValueX, debugRowY);
+    tft.print("Debug: ");
+    tft.print(debugText);
+    cache.debug_mode = state.debug_mode;
+  }
+
+  const char* transportText = transportModeText(state.transport_mode);
+  if (!cache.initialized || cache.transport_mode != state.transport_mode) {
+    tft.fillRect(kLiveValueX, transportRowY, kLiveValueWidth, kTextLineHeight, ST77XX_BLACK);
+    tft.setCursor(kLiveValueX, transportRowY);
+    tft.print("Transport: ");
+    tft.print(transportText);
+    cache.transport_mode = state.transport_mode;
+  }
+
+  const char* modeText = displayModeText(state.display_mode);
+  if (!cache.initialized || cache.display_mode != state.display_mode) {
+    tft.fillRect(kLiveValueX, modeRowY, kLiveValueWidth, kTextLineHeight, ST77XX_BLACK);
+    tft.setCursor(kLiveValueX, modeRowY);
+    tft.print("Mode: ");
+    tft.print(modeText);
+    cache.display_mode = state.display_mode;
+  }
+
+  cache.initialized = true;
+}
+
+void renderTrendView(Adafruit_ST7789& tft, const SystemState& state) {
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(textSize);
+  tft.setCursor(trendHeaderY, trendHeaderY);
+  tft.print("Trend View");
+  drawTrendGraph(tft, 0, trendGraphTop1, kTrendGraphWidth, kTrendGraphHeight, state, state.trend_hv_pos, state.trend_hv_neg);
+  drawTrendGraph(tft, 0, trendGraphTop2, kTrendGraphWidth, kTrendGraphHeight, state, state.trend_imon_pos, state.trend_imon_neg);
+}
+
+}  // namespace
+
+void initDisplay(Adafruit_ST7789& tft) {
+  tft.init(screenHeight, screenWidth);
+  tft.setRotation(-1);
   tft.fillScreen(ST77XX_BLACK);
-  tft.setCursor(0, 0);
+  tft.setCursor(84, 108);
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(2);
+  tft.println("INITIALIZING");
+}
 
-  tft.print("+Vset: ");
-  tft.println(state.vset_pos, 3);
-  tft.print("+Vmon: ");
-  tft.println(state.vmon_pos, 3);
-  tft.print("+HV: ");
-  tft.println(state.hv_pos, 1);
+void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
+  static LiveDisplayCache cache;
+  static DisplayMode lastDisplayMode = DisplayMode::Live;
+  static bool initialFrame = true;
+  static uint32_t welcomeStartMs = 0;
+  static bool welcomeSequenceStarted = false;
 
-  tft.print("-Vset: ");
-  tft.println(state.vset_neg, 3);
-  tft.print("-Vmon: ");
-  tft.println(state.vmon_neg, 3);
-  tft.print("-HV: ");
-  tft.println(state.hv_neg, 1);
+  if (hasActiveError()) {
+    renderErrorScreen(tft);
+    return;
+  }
 
-  tft.print("Debug: ");
-  tft.println(state.debug_mode ? "ON" : "OFF");
-  tft.print("Transport: ");
-  tft.println(transportModeText(state.transport_mode));
-  tft.print("Mode: ");
-  tft.println(displayModeText(state.display_mode));
+  if (!welcomeSequenceStarted) {
+    welcomeSequenceStarted = true;
+    welcomeStartMs = millis();
+  }
+
+  const uint32_t elapsedMs = millis() - welcomeStartMs;
+  if (elapsedMs < welcomeScreenMs) {
+    showWelcomeLogo(tft);
+    return;
+  }
+
+  if (elapsedMs < welcomeScreenMs + warningScreenMs) {
+    showWarningScreen(tft);
+    return;
+  }
+
+  if (initialFrame || lastDisplayMode != state.display_mode) {
+    tft.fillScreen(ST77XX_BLACK);
+    lastDisplayMode = state.display_mode;
+    initialFrame = false;
+    cache.initialized = false;
+
+    if (state.display_mode == DisplayMode::Trend) {
+      renderTrendView(tft, state);
+    } else {
+      renderLiveView(tft, state, cache);
+    }
+    return;
+  }
+
+  if (state.display_mode == DisplayMode::Trend) {
+    tft.fillRect(0, trendGraphTop1, screenWidth, trendGraphHeight, ST77XX_BLACK);
+    tft.fillRect(0, trendGraphTop2, screenWidth, trendGraphHeight, ST77XX_BLACK);
+    renderTrendView(tft, state);
+    return;
+  }
+
+  renderLiveView(tft, state, cache);
 }

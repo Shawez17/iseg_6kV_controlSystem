@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="368"
+   height="295"
+   id="svg2457">
+  <defs
+     id="defs2460" />
+  <rect
+     width="358"
+     height="141"
+     x="5"
+     y="4"
+     id="rect3238"
+     style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <path
+     d="M 174.88948,16.573921 C 131.34694,17.892201 86.893617,22.772911 46.692022,41.615491 C 34.204177,48.196061 18.832265,56.927251 16.156844,72.888081 C 15.041855,87.419871 27.834564,97.392901 38.418904,103.90437 C 71.820596,122.85097 110.13276,128.75417 147.47114,132.15484 C 199.2207,135.6945 252.24888,132.8666 301.84134,116.19601 C 318.9794,109.60244 338.49632,102.16661 348.68688,84.772121 C 355.07864,73.340461 347.68998,59.910541 338.51737,53.103851 C 314.81476,34.603781 285.12028,27.906551 256.71921,22.448421 C 229.72104,17.861681 202.26339,16.102961 174.88948,16.573921 z"
+     id="Oval"
+     style="opacity:1;fill:#d2232a;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     x="182.67188"
+     y="98.091797"
+     id="Danger"
+     xml:space="preserve"
+     style="font-size:75px;font-style:normal;font-weight:bold;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Helvetica"><tspan
+       x="182.67188"
+       y="98.091797"
+       id="tspan3250"
+       style="font-size:65px;font-style:normal;font-weight:bold">DANGER</tspan></text>
+  <text
+     x="184.1001"
+     y="214.78906"
+     id="High"
+     xml:space="preserve"
+     style="font-size:75px;font-style:normal;font-weight:bold;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Helvetica"><tspan
+       x="184.1001"
+       y="214.78906"
+       id="tspan3260"
+       style="font-size:75px">HIGH</tspan></text>
+  <text
+     x="185.66162"
+     y="282.78906"
+     id="Voltage"
+     xml:space="preserve"
+     style="font-size:75px;font-style:normal;font-weight:bold;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Helvetica"><tspan
+       x="185.66162"
+       y="282.78906"
+       id="tspan3266"
+       style="font-size:75px">VOLTAGE</tspan></text>
+</svg>

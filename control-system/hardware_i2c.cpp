@@ -132,21 +132,6 @@ void updateAdcReadings(Adafruit_ADS1115& positive,
   }
 }
 
-void flush_to_serial(const SystemState& state) {
-
-  Serial.printf("POS:  Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
-                state.vmon_pos,
-                state.imon_pos,
-                state.vset_pos,
-                state.hv_pos);
-
-  Serial.printf("NEG:  Vmon = %.4f V, Imon = %.4f V, Vset = %.4f V, HV = %.4f V\n",
-                state.vmon_neg,
-                state.imon_neg,
-                state.vset_neg,
-                state.hv_neg);
-}
-
 void setupDacModule(DFRobot_GP8XXX_IIC& dac, SystemState& state) {
   //state.dac_code_0 = 32767; // Set DAC channel 0 to mid-scale (0V)
 

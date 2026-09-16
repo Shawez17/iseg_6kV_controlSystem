@@ -1,25 +1,27 @@
 # control-system
 
-The main control system for the HV-6kV-2Ch project is implemented using Wiznet W5100S-EVB-Pico microcontroller module containing a RP2040 MCU and the W5100 Ethernet controller.
+The main control system for the HV-6kV-2Ch project runs on the WIZnet W5100S-EVB-Pico board, which uses an RP2040 MCU and the W5100 Ethernet controller.
 
 ## Code organization
 
-The project is organized into a small Arduino-style modular layout:
+The sketch is intentionally kept compact and focused on a few responsibilities:
 
-- `control-system.ino` is intentionally minimal. It only initializes hardware and calls the subsystem functions.
-- `config.h` holds board-specific constants such as GPIO numbers, sampling counts, timing delays, and scaling factors.
-- `state.h` defines the current runtime state so the modules share a single source of truth instead of multiple unrelated globals.
-- `hardware_i2c.*` handles the I2C bus setup, scanning, and bus-level configuration.
-- `adc_readout.*` reads the ADS1115 channels, averages samples, and converts ADC counts into engineering units.
-- `dac_control.*` is responsible for writing the DAC values that command the HV system output.
-- `display_ui.*` draws the TFT status screen and shows live system values.
-- `serial_commands.*` reads Serial commands such as `DEBUG` and `STOP` and toggles runtime behavior.
+- `control-system.ino` owns setup/loop orchestration only.
+- `config.h` stores board-level constants, GPIO mapping, timing, and scaling values.
+- `state.h` defines the single runtime state used by the control logic and display.
+- `hardware_i2c.*` configures I2C, reads the ADS1115 channels, and updates the DAC outputs.
+- `display_ui.*` draws the TFT UI and refreshes only the values that changed.
+- `serial_communication.*` handles USB and debug command parsing while keeping serial output off when no host is connected.
 
+## Serial behavior
 
-## Serial commands
+- `DEBUG` and `DEBUG ON` enable debug output.
+- `STOP` and `DEBUG OFF` disable debug output.
+- Serial output is only emitted when debug mode is active or a serial host is connected.
+- The firmware does not wait forever for a monitor; it continues running without blocking on `Serial`.
 
-- `DEBUG` enables debug mode.
-- `STOP` disables debug mode.
+## Example commands
+
 - `DAC?` prints the current DAC codes.
 - `DAC0=<0-32767>` updates DAC channel 0.
 - `DAC1=<0-32767>` updates DAC channel 1.

@@ -4,9 +4,9 @@
 #include "state.h"
 #include "hardware_i2c.h"
 #include "display_ui.h"
-#include "serial_commands.h"
-#include "transport_control.h"
-#include "network_transport.h"
+#include "serial_communication.h"
+#include "ethernet_communication.h"
+#include "error_handling.h"
 
 Adafruit_ADS1115 adsPositive;
 Adafruit_ADS1115 adsNegative;
@@ -19,12 +19,7 @@ void setup() {
   pinMode(LED_GPIO, OUTPUT);
   digitalWrite(LED_GPIO, LOW);
 
-  Serial.begin(9600);
-  while (!Serial) {
-    delay(10);
-  }
-
-//  Serial.println("Starting HV control system...");
+  initializeSerialPort();
 
   SPI1.setSCK(10);
   SPI1.setTX(11);
@@ -33,44 +28,37 @@ void setup() {
 
   initDisplay(tft);
   setupModeSelectPins();
-  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN); 
+  setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
   scanI2cDevices(Wire1);
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);
-
-  initNetworkTransport(systemState);
+  initializeEthernetCommunication();
 
   systemState.transport_mode = TransportMode::Usb;
   systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
- // Serial.println("Setup is done\nSystem ready.");
 }
 
 void loop() {
-
-  digitalWrite(LED_GPIO, HIGH);
-  delay(1000);
-  digitalWrite(LED_GPIO, LOW);
-  delay(1000);
-  static unsigned long lastDisplayUpdateMs = 0;
   updateTransportMode(systemState);
   updateDisplayMode(systemState);
-  handleSerialCommands(Serial, systemState, CommandSource::Usb); 
-  //if (systemState.transport_mode == TransportMode::Ethernet) {
-  //  pollNetworkTransport(systemState);
-  //
-  //}
+  updateErrorState();
+
+  if (hasActiveError()) {
+    renderDisplay(tft, systemState);
+    return;
+  }
+
+  if (systemState.transport_mode == TransportMode::Ethernet) {
+    pollEthernetCommunication(systemState);
+  } else {
+    handleSerialCommands(Serial, systemState, CommandSource::Usb);
+  }
+
   updateDacOutputs(gp8413, systemState);
   renderDisplay(tft, systemState);
-
   updateAdcReadings(adsPositive, adsNegative, systemState);
-    //if (millis() - lastDisplayUpdateMs > 250) {
-   //if (millis() - lastDisplayUpdateMs > 250) {
-  //  lastDisplayUpdateMs = millis();
-  //}
-  
-  
-  flush_to_serial(systemState);
-  digitalWrite(LED_GPIO, HIGH);
-  delay(50);
+  flushToSerial(systemState);
+
+  digitalWrite(LED_GPIO, !digitalRead(LED_GPIO));
 }
