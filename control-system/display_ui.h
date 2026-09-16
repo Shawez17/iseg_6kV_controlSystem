@@ -8,15 +8,15 @@
 
 constexpr uint16_t screenWidth = 320;
 constexpr uint16_t screenHeight = 240;
-constexpr uint16_t textSize = 2;
+constexpr uint16_t textSize = 3;
 
-constexpr uint16_t lineHeight = 18;
+constexpr uint16_t lineHeight = 24;
 constexpr uint16_t valueX = 0;
 constexpr uint16_t valueWidth = 220;
 constexpr uint16_t liveTopY = 0;
-constexpr uint16_t debugRowY = 108;
-constexpr uint16_t transportRowY = 126;
-constexpr uint16_t modeRowY = 144;
+constexpr uint16_t debugRowY = liveTopY + 6 * lineHeight;
+constexpr uint16_t transportRowY = liveTopY + 7 * lineHeight;
+constexpr uint16_t modeRowY = liveTopY + 8 * lineHeight;
 constexpr uint8_t voltagePrecision = 3;
 constexpr uint8_t hvPrecision = 1;
 constexpr float valueEpsilon = 0.0005f;

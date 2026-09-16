@@ -1,5 +1,6 @@
 #include "display_ui.h"
 
+#include "display_images.h"
 #include "error_handling.h"
 
 namespace {
@@ -50,62 +51,36 @@ bool nearlyEqual(float lhs, float rhs, float epsilon = valueEpsilon) {
   return fabs(lhs - rhs) <= epsilon;
 }
 
-void drawWarningSymbol(Adafruit_ST7789& tft, int16_t cx, int16_t cy) {
-  tft.fillTriangle(cx, cy - 34, cx - 34, cy + 28, cx + 34, cy + 28, ST77XX_YELLOW);
-  tft.fillTriangle(cx, cy - 24, cx - 22, cy + 18, cx + 22, cy + 18, ST77XX_BLACK);
-  tft.fillRect(cx - 4, cy - 8, 8, 22, ST77XX_YELLOW);
-  tft.fillRect(cx - 4, cy + 18, 8, 8, ST77XX_YELLOW);
+void drawWarningSign(Adafruit_ST7789& tft) {
+  const int16_t x = (screenWidth - 170) / 2;
+  const int16_t y = (screenHeight - 143) / 2;
+  tft.drawRGBBitmap(x, y, dangerHighVoltageData, 170, 143);
 }
 
-void drawTifrBrandMark(Adafruit_ST7789& tft, int16_t cx, int16_t cy) {
-  tft.fillRoundRect(cx - 62, cy - 34, 124, 68, 12, ST77XX_BLUE);
-  tft.drawRoundRect(cx - 62, cy - 34, 124, 68, 12, ST77XX_CYAN);
-
-  tft.fillTriangle(cx - 36, cy + 22, cx + 36, cy + 22, cx, cy - 20, ST77XX_RED);
-  tft.fillRect(cx - 6, cy - 18, 12, 42, ST77XX_WHITE);
-  tft.fillRect(cx - 28, cy - 18, 56, 8, ST77XX_WHITE);
+void drawTifrLogo(Adafruit_ST7789& tft) {
+  const int16_t x = 0;
+  const int16_t y = (screenHeight - 68) / 2;
+  tft.fillRect(0, 0, screenWidth, screenHeight, ST77XX_WHITE);
+  tft.drawRGBBitmap(x, y, tifrhLogoData, 320, 68);
 }
 
 void showWelcomeLogo(Adafruit_ST7789& tft) {
-  tft.fillScreen(ST77XX_BLACK);
-
-  tft.fillRect(0, 0, screenWidth, 32, kDarkNavy);
-  tft.setTextColor(ST77XX_CYAN);
-  tft.setTextSize(2);
-  tft.setCursor(96, 8);
-  tft.println("TIFR");
-
-  drawTifrBrandMark(tft, screenWidth / 2, 92);
-
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(3);
-  tft.setCursor(38, 150);
-  tft.println("HIGH VOLTAGE");
-  tft.setTextSize(2);
-  tft.setCursor(72, 190);
-  tft.println("CONTROL SYSTEM");
+  tft.fillScreen(ST77XX_WHITE);
+  drawTifrLogo(tft);
 }
 
 void showWarningScreen(Adafruit_ST7789& tft) {
-  tft.fillScreen(ST77XX_BLACK);
-  tft.fillRoundRect(24, 28, screenWidth - 48, 184, 18, kDarkNavy);
-  tft.drawRoundRect(24, 28, screenWidth - 48, 184, 18, ST77XX_RED);
-
-  drawWarningSymbol(tft, 76, 92);
+  tft.fillScreen(ST77XX_WHITE);
+  drawWarningSign(tft);
 
   tft.setTextColor(ST77XX_RED);
-  tft.setTextSize(3);
-  tft.setCursor(110, 42);
+  tft.setTextSize(2);
+  tft.setCursor(102, 194);
   tft.println("WARNING");
 
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(2);
-  tft.setCursor(92, 114);
+  tft.setTextColor(ST77XX_BLACK);
+  tft.setCursor(72, 214);
   tft.println("HIGH VOLTAGE");
-  tft.setCursor(95, 142);
-  tft.println("DO NOT TOUCH");
-  tft.setCursor(62, 170);
-  tft.println("AUTHORIZED PERSONNEL ONLY");
 }
 
 void drawTrendGraph(Adafruit_ST7789& tft,
@@ -251,27 +226,49 @@ void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
   static DisplayMode lastDisplayMode = DisplayMode::Live;
   static bool initialFrame = true;
   static uint32_t welcomeStartMs = 0;
-  static bool welcomeSequenceStarted = false;
+  static uint32_t warningStartMs = 0;
+  static enum class StartupPhase {
+    Welcome,
+    Warning,
+    Live
+  } startupPhase = StartupPhase::Welcome;
 
   if (hasActiveError()) {
     renderErrorScreen(tft);
     return;
   }
 
-  if (!welcomeSequenceStarted) {
-    welcomeSequenceStarted = true;
-    welcomeStartMs = millis();
-  }
+  const uint32_t now = millis();
 
-  const uint32_t elapsedMs = millis() - welcomeStartMs;
-  if (elapsedMs < welcomeScreenMs) {
-    showWelcomeLogo(tft);
-    return;
-  }
+  if (startupPhase == StartupPhase::Welcome) {
+    if (welcomeStartMs == 0) {
+      welcomeStartMs = now;
+    }
 
-  if (elapsedMs < welcomeScreenMs + warningScreenMs) {
+    if (now - welcomeStartMs < welcomeScreenMs) {
+      showWelcomeLogo(tft);
+      return;
+    }
+
+    startupPhase = StartupPhase::Warning;
+    warningStartMs = now;
     showWarningScreen(tft);
     return;
+  }
+
+  if (startupPhase == StartupPhase::Warning) {
+    if (warningStartMs == 0) {
+      warningStartMs = now;
+    }
+
+    if (now - warningStartMs < warningScreenMs) {
+      showWarningScreen(tft);
+      return;
+    }
+
+    startupPhase = StartupPhase::Live;
+    initialFrame = true;
+    lastDisplayMode = DisplayMode::Live;
   }
 
   if (initialFrame || lastDisplayMode != state.display_mode) {

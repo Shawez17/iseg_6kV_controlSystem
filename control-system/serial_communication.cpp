@@ -5,8 +5,6 @@
 
 namespace {
 
-constexpr uint32_t SERIAL_BAUD_RATE = 9600;
-
 bool canPrintToStream(Stream& serial, const SystemState& state) {
   return state.debug_mode;
 }

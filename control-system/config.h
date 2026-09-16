@@ -20,8 +20,8 @@ constexpr int WNET_INT_PIN = 21;
 
 constexpr int I2C0_SDA = 4;
 constexpr int I2C0_SCL = 5;
-constexpr int I2C1_SDA = 6;
-constexpr int I2C1_SCL = 7;
+constexpr int I2C1_SDA = 2;
+constexpr int I2C1_SCL = 3;
 
 constexpr int TFT_SCK = 10;
 constexpr int TFT_TX = 11;
