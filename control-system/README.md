@@ -21,9 +21,11 @@ The firmware accepts ASCII commands over the USB serial port and also supports t
 
 - `DEBUG` and `DEBUG ON` enable debug output.
 - `STOP` and `DEBUG OFF` disable debug output.
-- Serial output is intentionally gated: it only prints when debug mode is enabled.
+- Command responses are printed to USB serial when a serial host is connected.
+- Continuous telemetry printing runs only while debug mode is enabled.
 - The firmware never blocks waiting for a serial monitor; it keeps executing even if no host is connected.
 - Ethernet-mode traffic follows the same command parser, but USB control is rejected when Ethernet is active.
+- During an active error state, incoming commands are still parsed so `ERROR:CLEAR` can recover immediately.
 
 ### Supported commands
 
@@ -34,8 +36,12 @@ The firmware accepts ASCII commands over the USB serial port and also supports t
 | `ERROR:CLEAR` | Clears the current active error state. | Used to reset error screens and faults. |
 | `CONF:TRAN?` | Reports the active transport mode. | Returns `TRANSPORT=USB` or `TRANSPORT=ETHERNET`. |
 | `SOUR:VOLT<ch>,<volts>` | Sets the target set-point voltage for a channel. | Format: `SOUR:VOLT1,1200` or `SOUR:VOLT2,1500`. |
-| `MEAS:VOLT?` | Prints the current measured and set-point voltages. | Includes +VSET, +HV, -VSET, and -HV values. |
-| `MEAS:CURR?` | Prints the current monitor values. | Includes +IMON and -IMON values. |
+| `MEAS:VOLT?` / `MEAS:VOLT` | Prints the current measured and set-point voltages. | Includes +VSET, +HV, -VSET, and -HV values. |
+| `MEAS:VOLT1` / `MEAS:VOLT1?` | Prints positive-channel voltage snapshot. | Returns +VSET and +HV. |
+| `MEAS:VOLT2` / `MEAS:VOLT2?` | Prints negative-channel voltage snapshot. | Returns -VSET and -HV. |
+| `MEAS:CURR?` / `MEAS:CURR` | Prints the current monitor values. | Includes +IMON and -IMON values. |
+| `MEAS:CURR1` / `MEAS:CURR1?` | Prints positive-channel current monitor. | Returns +IMON. |
+| `MEAS:CURR2` / `MEAS:CURR2?` | Prints negative-channel current monitor. | Returns -IMON. |
 | `SOUR:DAC<ch>,<code>` | Sets a DAC raw code value. | Requires debug mode. |
 | `DAC?` | Prints the current DAC codes. | Returns `DAC_CODE_0=... , DAC_CODE_1=...`. |
 | `DAC0=<code>` | Writes a raw DAC code into channel 0. | Requires debug mode. |
@@ -64,8 +70,10 @@ The raw DAC commands are intentionally debug-only for safety. They are accepted 
 
 #### Diagnostics
 
-- `MEAS:VOLT?` prints the current readings as a compact snapshot
-- `MEAS:CURR?` prints current monitor values for both channels
+- `MEAS:VOLT?` (or `MEAS:VOLT`) prints both channels as a compact snapshot
+- `MEAS:VOLT1` and `MEAS:VOLT2` print per-channel voltage snapshots
+- `MEAS:CURR?` (or `MEAS:CURR`) prints both current monitor values
+- `MEAS:CURR1` and `MEAS:CURR2` print per-channel current monitor values
 - `CONF:TRAN?` reports whether the board is in `USB` or `ETHERNET` mode
 - `ERROR:CLEAR` resets the fault state so the system can resume after a command or transport error
 
@@ -76,6 +84,7 @@ DEBUG ON
 SOUR:VOLT1,2.500
 SOUR:VOLT2,-1.250
 MEAS:VOLT?
+MEAS:VOLT1
 DAC? 
 STOP
 ```

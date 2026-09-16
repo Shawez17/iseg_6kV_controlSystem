@@ -25,18 +25,17 @@ void setup() {
   SPI1.setTX(11);
   SPI1.setRX(12);
   SPI1.setCS(TFT_CS);
-
   initDisplay(tft);
   setupModeSelectPins();
   setupI2cHardware(Wire1, I2C_SDA_PIN, I2C_SCL_PIN);
   scanI2cDevices(Wire1);
   setupAdcModule(adsPositive, adsNegative);
   setupDacModule(gp8413, systemState);
-  initializeEthernetCommunication();
-
+  
   systemState.transport_mode = TransportMode::Usb;
   systemState.display_mode = DisplayMode::Live;
   systemState.debug_mode = false;
+  digitalWrite(0, HIGH);
 }
 
 void loop() {
@@ -45,8 +44,16 @@ void loop() {
   updateErrorState();
 
   if (hasActiveError()) {
-    renderDisplay(tft, systemState);
-    return;
+    if (systemState.transport_mode == TransportMode::Ethernet) {
+      pollEthernetCommunication(systemState);
+    } else {
+      handleSerialCommands(Serial, systemState, CommandSource::Usb);
+    }
+
+    if (hasActiveError()) {
+      renderDisplay(tft, systemState);
+      return;
+    }
   }
 
   if (systemState.transport_mode == TransportMode::Ethernet) {

@@ -1,12 +1,22 @@
 #include "serial_communication.h"
 
+#include <Ethernet.h>
+
 #include "config.h"
 #include "error_handling.h"
 
 namespace {
 
 bool canPrintToStream(Stream& serial, const SystemState& state) {
-  return state.debug_mode;
+  (void)state;
+
+  // USB replies are printed only when a host is connected.
+  if (&serial == &Serial) {
+    return isSerialHostConnected();
+  }
+
+  // Non-USB streams (for example Ethernet client sockets) can receive replies.
+  return true;
 }
 
 bool isSelectablePin(int pin) {
@@ -68,6 +78,10 @@ const char* transportText(TransportMode mode) {
   return (mode == TransportMode::Ethernet) ? "ETHERNET" : "USB";
 }
 
+const char* pinStateText(bool isHigh) {
+  return isHigh ? "HIGH" : "LOW";
+}
+
 void printLine(Stream& serial, const SystemState& state, const String& message) {
   if (canPrintToStream(serial, state)) {
     serial.println(message);
@@ -80,12 +94,63 @@ void printLine(Stream& serial, const SystemState& state, const __FlashStringHelp
   }
 }
 
+void printVoltageMeasurement(Stream& serial, const SystemState& state, uint8_t channel) {
+  if (!canPrintToStream(serial, state)) {
+    return;
+  }
+
+  if (channel == 1) {
+    serial.print("+VSET=");
+    serial.print(state.vset_pos, 3);
+    serial.print(", +HV=");
+    serial.println(state.hv_pos, 1);
+    return;
+  }
+
+  serial.print("-VSET=");
+  serial.print(state.vset_neg, 3);
+  serial.print(", -HV=");
+  serial.println(state.hv_neg, 1);
+}
+
+void printCurrentMeasurement(Stream& serial, const SystemState& state, uint8_t channel) {
+  if (!canPrintToStream(serial, state)) {
+    return;
+  }
+
+  if (channel == 1) {
+    serial.print("+IMON=");
+    serial.println(state.imon_pos, 4);
+    return;
+  }
+
+  serial.print("-IMON=");
+  serial.println(state.imon_neg, 4);
+}
+
 bool isVoltageCommand(const String& command) {
   return command.startsWith("SOUR:VOLT") || command.startsWith("MEAS:VOLT") || command.startsWith("CONF:IP");
 }
 
 bool isDebugDacCommand(const String& command) {
   return command == "DAC?" || command.startsWith("DAC0=") || command.startsWith("DAC1=") || command.startsWith("DAC=") || command.startsWith("SOUR:DAC");
+}
+
+bool ethernetCableConnected() {
+  return Ethernet.linkStatus() == LinkON;
+}
+
+void handleEthernetTransportFailure(SystemState& state) {
+  if (state.transport_mode != TransportMode::Ethernet) {
+    return;
+  }
+
+  raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
+             "Ethernet cable disconnected; falling back to USB");
+
+  if (isSerialHostConnected()) {
+    state.transport_mode = TransportMode::Usb;
+  }
 }
 
 }  // namespace
@@ -106,20 +171,35 @@ bool isDebugOutputEnabled(const SystemState& state) {
 void setupModeSelectPins() {
   if (isSelectablePin(TRANSPORT_SEL_PIN)) {
     pinMode(TRANSPORT_SEL_PIN,
-            TRANSPORT_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT_PULLDOWN);
+            TRANSPORT_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT);
   }
 
   if (isSelectablePin(DISPLAY_SEL_PIN)) {
     pinMode(DISPLAY_SEL_PIN,
-            DISPLAY_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT_PULLDOWN);
+            DISPLAY_SEL_USE_PULLUP ? INPUT_PULLUP : INPUT);
   }
 }
 
 void updateTransportMode(SystemState& state) {
-  if (isSelectablePin(TRANSPORT_SEL_PIN)) {
-    state.transport_mode = (digitalRead(TRANSPORT_SEL_PIN) == HIGH)
-                               ? TransportMode::Ethernet
-                               : TransportMode::Usb;
+  if (!isSelectablePin(TRANSPORT_SEL_PIN)) {
+    state.transport_mode = TransportMode::Usb;
+    state.display_mode = DisplayMode::Live;
+    return;
+  }
+
+  const bool ethernetSelected = (digitalRead(TRANSPORT_SEL_PIN) == HIGH);
+
+  if (ethernetSelected && !ethernetCableConnected()) {
+    state.transport_mode = TransportMode::Usb;
+    state.display_mode = DisplayMode::Live;
+    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
+               "Ethernet cable disconnected; using USB and live display");
+    return;
+  }
+
+  state.transport_mode = ethernetSelected ? TransportMode::Ethernet : TransportMode::Usb;
+  if (state.transport_mode == TransportMode::Usb) {
+    state.display_mode = DisplayMode::Live;
   }
 }
 
@@ -147,16 +227,26 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
   if (command == "DEBUG" || command == "DEBUG ON") {
     state.debug_mode = true;
     printLine(serial, state, "Entering debug mode...");
-  } else if (command == "STOP" || command == "DEBUG OFF") {
+  } 
+  else if (command == "STOP" || command == "DEBUG OFF") {
     state.debug_mode = false;
     printLine(serial, state, "Exiting debug mode...");
-  } else if (command == "ERROR:CLEAR") {
+  } 
+  else if (command == "ERROR:CLEAR") {
     clearErrorState();
     printLine(serial, state, "Error state cleared");
-  } else if (command == "CONF:TRAN?") {
+  } 
+  else if (command == "CONF:TRAN?") {
     if (canPrintToStream(serial, state)) {
       serial.print("TRANSPORT=");
       serial.println(transportText(state.transport_mode));
+    }
+  } 
+  else if (command == "CONF:SEL?") {
+    if (canPrintToStream(serial, state)) {
+      const bool selectorHigh = isSelectablePin(TRANSPORT_SEL_PIN) && (digitalRead(TRANSPORT_SEL_PIN) == HIGH);
+      serial.print("TRANSPORT_SEL_PIN=");
+      serial.println(pinStateText(selectorHigh));
     }
   } else if (command.startsWith("SOUR:VOLT")) {
     if (source == CommandSource::Usb && state.transport_mode == TransportMode::Ethernet) {
@@ -191,7 +281,7 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
         serial.println(state.dac_code_1);
       }
     }
-  } else if (command == "MEAS:VOLT?") {
+  } else if (command == "MEAS:VOLT?" || command == "MEAS:VOLT") {
     if (canPrintToStream(serial, state)) {
       serial.print("+VSET=");
       serial.print(state.vset_pos, 3);
@@ -202,13 +292,21 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
       serial.print(", -HV=");
       serial.println(state.hv_neg, 1);
     }
-  } else if (command == "MEAS:CURR?") {
+  } else if (command == "MEAS:VOLT1" || command == "MEAS:VOLT1?") {
+    printVoltageMeasurement(serial, state, 1);
+  } else if (command == "MEAS:VOLT2" || command == "MEAS:VOLT2?") {
+    printVoltageMeasurement(serial, state, 2);
+  } else if (command == "MEAS:CURR?" || command == "MEAS:CURR") {
     if (canPrintToStream(serial, state)) {
       serial.print("+IMON=");
       serial.print(state.imon_pos, 4);
       serial.print(", -IMON=");
       serial.println(state.imon_neg, 4);
     }
+  } else if (command == "MEAS:CURR1" || command == "MEAS:CURR1?") {
+    printCurrentMeasurement(serial, state, 1);
+  } else if (command == "MEAS:CURR2" || command == "MEAS:CURR2?") {
+    printCurrentMeasurement(serial, state, 2);
   } else if (command.startsWith("SOUR:DAC")) {
     if (!state.debug_mode) {
       raiseError(serial, ErrorCode::Command, "COMMAND", "Raw DAC commands require debug mode");
@@ -300,7 +398,7 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
 }
 
 void flushToSerial(const SystemState& state) {
-  if (!isDebugOutputEnabled(state)) {
+  if (!isDebugOutputEnabled(state) || !isSerialHostConnected()) {
     return;
   }
 
