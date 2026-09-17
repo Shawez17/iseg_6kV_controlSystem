@@ -128,14 +128,6 @@ void printCurrentMeasurement(Stream& serial, const SystemState& state, uint8_t c
   serial.println(state.imon_neg, 4);
 }
 
-bool isVoltageCommand(const String& command) {
-  return command.startsWith("SOUR:VOLT") || command.startsWith("MEAS:VOLT") || command.startsWith("CONF:IP");
-}
-
-bool isDebugDacCommand(const String& command) {
-  return command == "DAC?" || command.startsWith("DAC0=") || command.startsWith("DAC1=") || command.startsWith("DAC=") || command.startsWith("SOUR:DAC");
-}
-
 }  // namespace
 
 void initializeSerialPort() {
@@ -178,6 +170,12 @@ void updateTransportMode(SystemState& state) {
 }
 
 void handleSerialCommands(Stream& serial, SystemState& state, CommandSource source) {
+  // The active transport is already selected exclusively by the caller
+  // (only one of Serial/Ethernet is ever polled per loop() iteration), so
+  // `source` is not currently used to gate behavior here. Kept in the
+  // signature for callers/future diagnostics (e.g. per-source logging).
+  (void)source;
+
   if (serial.available() <= 0) {
     return;
   }
@@ -215,11 +213,6 @@ void handleSerialCommands(Stream& serial, SystemState& state, CommandSource sour
       serial.println(pinStateText(selectorHigh));
     }
   } else if (command.startsWith("SOUR:VOLT")) {
-    if (source == CommandSource::Usb && state.transport_mode == TransportMode::Ethernet) {
-      raiseError(serial, ErrorCode::Transport, "TRANSPORT", "USB control disabled while Ethernet is active");
-      return;
-    }
-
     const String payload = command.substring(9);
     uint8_t channel = 0;
     float volts = 0.0f;

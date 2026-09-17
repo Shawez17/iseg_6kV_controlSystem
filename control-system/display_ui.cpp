@@ -1,3 +1,5 @@
+#include "hardware/watchdog.h"
+
 #include "display_ui.h"
 
 #include "display_images.h"
@@ -45,6 +47,21 @@ void setDisplayInverted(Adafruit_ST7789& tft, bool inverted) {
 
   tft.invertDisplay(inverted);
   isInverted = inverted;
+}
+
+// Splash screens hold the display for multiple seconds, which would exceed
+// the tight steady-state watchdog timeout if left as a single delay(); pet
+// the watchdog between short chunks instead so the wall-clock delay is
+// unchanged.
+void delayPettingWatchdog(uint32_t durationMs) {
+  constexpr uint32_t kChunkMs = 100;
+  uint32_t remainingMs = durationMs;
+  while (remainingMs > 0) {
+    const uint32_t stepMs = (remainingMs < kChunkMs) ? remainingMs : kChunkMs;
+    delay(stepMs);
+    watchdog_update();
+    remainingMs -= stepMs;
+  }
 }
 
 uint8_t trendSampleCount(const SystemState& state) {
@@ -372,7 +389,7 @@ void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
     if (welcomeStartMs == 0) {
       welcomeStartMs = now;
       showWelcomeLogo(tft);
-      delay(welcomeScreenMs);
+      delayPettingWatchdog(welcomeScreenMs);
     }
 
 
@@ -385,7 +402,7 @@ void renderDisplay(Adafruit_ST7789& tft, const SystemState& state) {
     if (warningStartMs == 0) {
       warningStartMs = now;
       showWarningScreen(tft);
-      delay(warningScreenMs);
+      delayPettingWatchdog(warningScreenMs);
     }
 
     // if (now - warningStartMs < warningScreenMs) {

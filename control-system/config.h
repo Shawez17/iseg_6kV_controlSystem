@@ -8,7 +8,17 @@
 #include <SPI.h>
 #include <Wire.h>
 
+// Steady-state watchdog timeout: tight enough to catch a hung I2C bus
+// (normal ADC reads/DAC writes complete in well under this window, and the
+// ADC sampling loop pets the watchdog between every channel read).
 constexpr uint32_t I2C_WATCHDOG_TIMEOUT_MS = 300;
+
+// Temporary watchdog window used only around the bounded-but-blocking
+// Ethernet DHCP acquisition call, which can otherwise exceed the tight
+// steady-state timeout above. Must stay under the RP2040 hardware watchdog
+// ceiling (~8.3s / 0x7fffff us).
+constexpr uint32_t WATCHDOG_STARTUP_TIMEOUT_MS = 8000;
+
 constexpr uint32_t SERIAL_BAUD_RATE = 9600;
 
 constexpr int WNET_RX_PIN = 16;
@@ -45,12 +55,7 @@ constexpr uint8_t ADDR_ADS1115_CH2 = 0x48;
 
 constexpr float CH1_HV_FACTOR = 1200.0f;
 constexpr float CH2_HV_FACTOR = -1200.0f;
-constexpr float CH1_CURRENT_FACTOR = 0.757f;
-constexpr float CH2_CURRENT_FACTOR = 0.757f;
 constexpr float CH1_MAX_VOLTS = 6000.0f;
-constexpr float CH2_MAX_VOLTS = 6000.0f;
-constexpr float CH1_MAX_CURRENT = 0.0f;
-constexpr float CH2_MAX_CURRENT = 0.0f;
 constexpr float HV_FACTOR_POS = CH1_HV_FACTOR;
 constexpr float HV_FACTOR_NEG = CH2_HV_FACTOR;
 constexpr float VSET_MAX_VOLTS = CH1_MAX_VOLTS;
@@ -63,9 +68,12 @@ constexpr uint16_t SETTLE_DELAY_MS = 2;
 constexpr uint8_t TREND_SAMPLES = 64;
 
 constexpr uint8_t ETHERNET_MAC_ADDRESS[6] = {0x02, 0x60, 0x51, 0x10, 0x50, 0x01};
-constexpr bool ETHERNET_USE_DHCP = true;
-constexpr uint8_t DEFAULT_IP[4] = {10, 10, 7, 254};
-constexpr uint8_t DEFAULT_SUBNET[4] = {255, 255, 255, 0};
-constexpr uint8_t DEFAULT_GATEWAY[4] = {10, 10, 7, 1};
 constexpr uint16_t TCP_PORT = 5025;
+
+// DHCP is the only supported addressing mode; no static-IP fallback.
+// Kept short (worst case ~5s) so a single acquisition attempt safely fits
+// inside WATCHDOG_STARTUP_TIMEOUT_MS; failed attempts are retried below.
+constexpr unsigned long ETHERNET_DHCP_TIMEOUT_MS = 4000;
+constexpr unsigned long ETHERNET_DHCP_RESPONSE_TIMEOUT_MS = 1000;
+constexpr unsigned long ETHERNET_DHCP_RETRY_MS = 10000;
 

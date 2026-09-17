@@ -6,6 +6,5 @@
 
 void initializeEthernetCommunication();
 void pollEthernetCommunication(SystemState& state);
-bool ethernetClientConnected();
 bool ethernetInterfaceReady();
 IPAddress ethernetLocalIP();

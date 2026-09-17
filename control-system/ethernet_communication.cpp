@@ -1,5 +1,18 @@
+/**
+ * ethernet_communication.cpp
+ *
+ * DHCP-only Ethernet transport for the on-board WIZnet W5100S.
+ * Modeled after WIZnet's official W5100S-EVB-Pico Arduino examples
+ * (DHCP_IP_Address / TCP_Server): Ethernet.init(csPin) followed by
+ * Ethernet.begin(mac) to obtain a DHCP lease, then a plain EthernetServer
+ * for the SCPI-style command parser. There is no static-IP fallback; if a
+ * lease cannot be obtained, acquisition is retried periodically.
+ */
+#include "hardware/watchdog.h"
+
 #include "ethernet_communication.h"
 
+#include <SPI.h>
 #include <Ethernet.h>
 
 #include "config.h"
@@ -8,17 +21,12 @@
 
 namespace {
 
-#ifdef WIZNET_CS_PIN
-constexpr int kWiznetCsPin = WIZNET_CS_PIN;
-#else
-constexpr int kWiznetCsPin = 17;
-#endif
-
 EthernetServer server(TCP_PORT);
 EthernetClient client;
-bool ethernetStarted = false;
+bool dhcpAcquired = false;
+uint32_t lastDhcpAttemptMs = 0;
 
-void printEthernetStatus(const String& message) {
+void printStatus(const String& message) {
   if (isSerialHostConnected()) {
     Serial.println(message);
   }
@@ -31,80 +39,52 @@ void stopClient() {
   client = EthernetClient();
 }
 
-void configureEthernetStatic() {
-  const IPAddress staticIp(DEFAULT_IP[0], DEFAULT_IP[1], DEFAULT_IP[2], DEFAULT_IP[3]);
-  const IPAddress subnet(DEFAULT_SUBNET[0], DEFAULT_SUBNET[1], DEFAULT_SUBNET[2], DEFAULT_SUBNET[3]);
-  const IPAddress gateway(DEFAULT_GATEWAY[0], DEFAULT_GATEWAY[1], DEFAULT_GATEWAY[2], DEFAULT_GATEWAY[3]);
-  const IPAddress dns(DEFAULT_GATEWAY[0], DEFAULT_GATEWAY[1], DEFAULT_GATEWAY[2], DEFAULT_GATEWAY[3]);
+bool acquireDhcpLease() {
+  printStatus("Requesting DHCP lease...");
 
-  Ethernet.begin(const_cast<uint8_t*>(ETHERNET_MAC_ADDRESS), staticIp, dns, gateway, subnet);
+  // Ethernet.begin() blocks internally for up to
+  // ETHERNET_DHCP_TIMEOUT_MS + ETHERNET_DHCP_RESPONSE_TIMEOUT_MS with no
+  // opportunity to pet the watchdog mid-call, so widen the watchdog window
+  // just for the duration of this call and restore the tight steady-state
+  // timeout immediately after.
+  watchdog_enable(WATCHDOG_STARTUP_TIMEOUT_MS, true);
+  const bool leaseObtained = Ethernet.begin(const_cast<uint8_t*>(ETHERNET_MAC_ADDRESS),
+                                            ETHERNET_DHCP_TIMEOUT_MS,
+                                            ETHERNET_DHCP_RESPONSE_TIMEOUT_MS) != 0;
+  watchdog_enable(I2C_WATCHDOG_TIMEOUT_MS, true);
 
-  if (Ethernet.localIP() == IPAddress(0, 0, 0, 0)) {
-    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Static Ethernet configuration failed");
-    return;
+  if (!leaseObtained) {
+    return false;
   }
 
-  printEthernetStatus("Static Ethernet configured");
-}
-
-void startEthernet() {
-  if (ethernetStarted) {
-    return;
-  }
-
-  Ethernet.init(kWiznetCsPin);
-
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Ethernet hardware not detected");
-    return;
-  }
-
-  printEthernetStatus("Initializing Ethernet via DHCP...");
-  printEthernetStatus("Using MAC: " + String(ETHERNET_MAC_ADDRESS[0], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[1], HEX) + ":" +
-                      String(ETHERNET_MAC_ADDRESS[2], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[3], HEX) + ":" +
-                      String(ETHERNET_MAC_ADDRESS[4], HEX) + ":" + String(ETHERNET_MAC_ADDRESS[5], HEX));
-
-  if (ETHERNET_USE_DHCP) {
-    Ethernet.begin(const_cast<uint8_t*>(ETHERNET_MAC_ADDRESS));
-  } else {
-    configureEthernetStatic();
-  }
-
-  if (Ethernet.localIP() == IPAddress(0, 0, 0, 0)) {
-    stopClient();
-    ethernetStarted = false;
-    printEthernetStatus("DHCP not ready yet; waiting for cable / DHCP server");
-    return;
-  }
-
-  server.begin();
-  ethernetStarted = true;
-
-  if (isSerialHostConnected()) {
-    Serial.print("Ethernet DHCP ready: ");
-    Serial.println(Ethernet.localIP());
-  }
+  printStatus("DHCP lease acquired: " + Ethernet.localIP().toString());
+  return true;
 }
 
 }  // namespace
 
 void initializeEthernetCommunication() {
-  startEthernet();
+  Ethernet.init(WNET_CS_PIN);
 
-  if (!ethernetStarted) {
-    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Ethernet cable disconnected or DHCP failed; USB remains active");
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    raiseError(Serial, ErrorCode::Transport, "TRANSPORT", "W5100S hardware not detected");
+    return;
   }
-}
 
-bool ethernetClientConnected() {
-  return client && client.connected();
+  lastDhcpAttemptMs = millis();
+  dhcpAcquired = acquireDhcpLease();
+
+  if (!dhcpAcquired) {
+    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
+               "DHCP lease not acquired; will keep retrying");
+    return;
+  }
+
+  server.begin();
 }
 
 bool ethernetInterfaceReady() {
-  return ethernetStarted && (Ethernet.localIP() != IPAddress(0, 0, 0, 0));
+  return dhcpAcquired && (Ethernet.localIP() != IPAddress(0, 0, 0, 0));
 }
 
 IPAddress ethernetLocalIP() {
@@ -117,18 +97,29 @@ void pollEthernetCommunication(SystemState& state) {
     return;
   }
 
-  if (Ethernet.linkStatus() != LinkON) {
+  if (Ethernet.linkStatus() == LinkOFF) {
     stopClient();
-    ethernetStarted = false;
-    raiseError(Serial, ErrorCode::Transport, "TRANSPORT",
-               "Ethernet cable disconnected; falling back to USB");
-    if (isSerialHostConnected()) {
-      state.transport_mode = TransportMode::Usb;
+    dhcpAcquired = false;
+    return;
+  }
+
+  if (!dhcpAcquired) {
+    if (millis() - lastDhcpAttemptMs >= ETHERNET_DHCP_RETRY_MS) {
+      lastDhcpAttemptMs = millis();
+      dhcpAcquired = acquireDhcpLease();
+      if (dhcpAcquired) {
+        server.begin();
+      }
     }
     return;
   }
 
-  startEthernet();
+  // Ethernet.maintain() can internally re-run the same bounded-but-blocking
+  // DHCP request/response exchange as acquireDhcpLease() when renewing a
+  // lease, so it needs the same temporary watchdog widening.
+  watchdog_enable(WATCHDOG_STARTUP_TIMEOUT_MS, true);
+  Ethernet.maintain();
+  watchdog_enable(I2C_WATCHDOG_TIMEOUT_MS, true);
 
   if (!client || !client.connected()) {
     stopClient();
